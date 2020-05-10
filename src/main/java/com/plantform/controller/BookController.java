@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.TimeZone;
 
 @RestController
@@ -23,6 +24,13 @@ public class BookController {
 
     @Resource
     BookRepository bookRepository;
+
+
+    @ResponseBody
+    @GetMapping("/findAllType")
+    public List<String> findAllType(){
+        return bookRepository.findAllType();
+    }
 
     @ResponseBody
     @GetMapping("/getBookList/{pageNum}/{pageSize}")
@@ -36,15 +44,16 @@ public class BookController {
     @PostMapping("/getBookListByOthers/{pageNum}/{pageSize}")
     public Page<Book> getBookListByOthers(@PathVariable("pageNum") Integer pageNum,
                                                 @PathVariable("pageSize") Integer pageSize,
-                                                @RequestBody Book book){
+                                                @RequestBody BookDTO bookDTO){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
-        String name = book.getName();
-        String publish = book.getPublish();
-        String type = book.getType();
-        String addTimeStart = "1998-01-01";
-        String addTimeEnd = "2020-05-08";
-        String publishTimeStart = "1998-01-01";
-        String publishTimeEnd = "2020-05-08";
+        String name = bookDTO.getName();
+        String publish = bookDTO.getPublish();
+        String type = bookDTO.getType();
+        String addTimeStart = bookDTO.getAddTimeStart();
+        String addTimeEnd = bookDTO.getAddTimeEnd();
+        String publishTimeStart = bookDTO.getPublishTimeStart();
+        String publishTimeEnd = bookDTO.getPublishTimeEnd();
+        System.out.println("name="+name+" publish="+publish+" type="+type+" addTimeStart="+addTimeStart+" addTimeEnd="+addTimeEnd+" publishTimeStart="+publishTimeStart+" publishTimeEnd="+publishTimeEnd);
         if(name.isEmpty() || name == null){
             name = "";
         }
@@ -79,13 +88,13 @@ public class BookController {
 
     @ResponseBody
     @GetMapping("/findBookById/{id}")
-    public Book findAccountById(@PathVariable("id") int id){
+    public Book findBookById(@PathVariable("id") int id){
         return bookRepository.findBookById(id);
     }
 
     @ResponseBody
     @PostMapping("/editBookById/{id}")
-    public MyResult editAccountById(@PathVariable("id") int id,
+    public MyResult editBookById(@PathVariable("id") int id,
                                     @RequestBody Book editForm){
         System.out.println("id="+id+" name="+editForm.getName()+" type="+editForm.getType()+" publish="+editForm.getPublish()+" addTime="+editForm.getAddTime()+" publishTime="+editForm.getPublishTime());
         int result = bookRepository.update(editForm.getName(),editForm.getPublish(),editForm.getType(),editForm.getAddTime().toString(),editForm.getPublishTime().toString(),id);

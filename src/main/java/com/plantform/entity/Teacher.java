@@ -1,5 +1,7 @@
 package com.plantform.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import javax.persistence.*;
 
 @Entity
@@ -23,7 +25,8 @@ public class Teacher {
     @Column
     private String password;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @JSONField(serialize = false)
+    @ManyToOne()
     @JoinColumn(name = "course_id")
     private Course course;
 

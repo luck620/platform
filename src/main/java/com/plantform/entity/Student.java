@@ -30,12 +30,6 @@ public class Student {
     @Column
     private String password;
 
-    @ManyToMany
-    @Cascade(org.hibernate.annotations.CascadeType.SAVE_UPDATE)
-    @JoinTable(name = "sc",
-            joinColumns = @JoinColumn(name = "sid"),
-            inverseJoinColumns = @JoinColumn(name = "cid"))
-    private Set<Course> courses = new HashSet<>();
 
     public int getId() {
         return id;
@@ -93,11 +87,4 @@ public class Student {
         this.password = password;
     }
 
-    public Set<Course> getCourses() {
-        return courses;
-    }
-
-    public void setCourses(Set<Course> courses) {
-        this.courses = courses;
-    }
 }

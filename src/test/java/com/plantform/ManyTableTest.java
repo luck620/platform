@@ -32,9 +32,6 @@ public class ManyTableTest {
         Student student2 = new Student();
         student1.setName("小刚");
 
-        student1.getCourses().add(course1);
-        student1.getCourses().add(course2);
 
-        course2.getStudents().add(student2);
     }
 }

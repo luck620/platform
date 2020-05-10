@@ -1,5 +1,7 @@
 package com.plantform.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -20,12 +22,14 @@ public class Course {
     private Integer stuNumber;//课程最大开设人数
 
     @ManyToMany
+    @JSONField(serialize = false)
     @JoinTable(name = "sc",
             joinColumns = @JoinColumn(name = "cid"),
             inverseJoinColumns = @JoinColumn(name = "sid"))
     private Set<Student> students = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL,mappedBy = "course")
+    @OneToMany(mappedBy = "course")
+    @JSONField(serialize = false)
     private Set<Teacher> teachers = new HashSet<>();
 
     public Integer getId() {

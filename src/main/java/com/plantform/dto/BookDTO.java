@@ -6,6 +6,12 @@ public class BookDTO {
     String type;
     String addTime;
     String publishTime;
+//    String[] addTimeStartAndEnd;
+//    String[] publishTimeStartAndEnd;
+    String addTimeStart;
+    String addTimeEnd;
+    String publishTimeStart;
+    String publishTimeEnd;
 
     public String getName() {
         return name;
@@ -46,4 +52,52 @@ public class BookDTO {
     public void setPublishTime(String publishTime) {
         this.publishTime = publishTime;
     }
+
+    public String getAddTimeStart() {
+        return addTimeStart;
+    }
+
+    public void setAddTimeStart(String addTimeStart) {
+        this.addTimeStart = addTimeStart;
+    }
+
+    public String getAddTimeEnd() {
+        return addTimeEnd;
+    }
+
+    public void setAddTimeEnd(String addTimeEnd) {
+        this.addTimeEnd = addTimeEnd;
+    }
+
+    public String getPublishTimeStart() {
+        return publishTimeStart;
+    }
+
+    public void setPublishTimeStart(String publishTimeStart) {
+        this.publishTimeStart = publishTimeStart;
+    }
+
+    public String getPublishTimeEnd() {
+        return publishTimeEnd;
+    }
+
+    public void setPublishTimeEnd(String publishTimeEnd) {
+        this.publishTimeEnd = publishTimeEnd;
+    }
+//
+//    public String[] getAddTimeStartAndEnd() {
+//        return addTimeStartAndEnd;
+//    }
+//
+//    public void setAddTimeStartAndEnd(String[] addTimeStartAndEnd) {
+//        this.addTimeStartAndEnd = addTimeStartAndEnd;
+//    }
+//
+//    public String[] getPublishTimeStartAndEnd() {
+//        return publishTimeStartAndEnd;
+//    }
+//
+//    public void setPublishTimeStartAndEnd(String[] publishTimeStartAndEnd) {
+//        this.publishTimeStartAndEnd = publishTimeStartAndEnd;
+//    }
 }

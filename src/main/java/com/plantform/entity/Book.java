@@ -27,7 +27,7 @@ public class Book {
     private LocalDateTime publishTime;
 
     @Column
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private LocalDateTime addTime;//添加时间
 
     @Column

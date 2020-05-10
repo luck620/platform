@@ -1,6 +1,5 @@
 package com.plantform.repository;
 
-import com.plantform.entity.Account;
 import com.plantform.entity.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,14 +8,18 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 public interface BookRepository extends JpaRepository<Book,Integer> {
-    @Query(nativeQuery = true, value = "select b.* from book b " +
-            "where case when ?1='' then 1=1 else b.name like %?1% end " +
-            "and case when ?2='' then 1=1 else b.publish like %?2% end " +
-            "and case when ?3='' then 1=1 else b.type like %?3% end " +
-            "and case when ?4='' then 1=1 else b.add_time between ?4 and ?5 end " +
-            "and case when ?6='' then 1=1 else b.publish_time between ?6 and ?7 end ")
+    @Query(nativeQuery = true,value = "select distinct b.type from book b")
+    List<String> findAllType();
+
+    @Query(nativeQuery = true, value = "SELECT b.* FROM book b " +
+            "WHERE CASE WHEN ?1='' THEN 1=1 ELSE b.name LIKE %?1% END " +
+            "AND CASE WHEN ?2='' THEN 1=1 ELSE b.publish LIKE %?2% END " +
+            "AND CASE WHEN ?3='' THEN 1=1 ELSE b.type LIKE %?3% END " +
+            "AND CASE WHEN ?4='' THEN 1=1 ELSE b.add_time BETWEEN ?4 AND ?5 END " +
+            "AND CASE WHEN ?6='' THEN 1=1 ELSE b.publish_time BETWEEN ?6 AND ?7 END ")
     Page<Book> findAllByOthers(String name, String publish, String type, String addTimeStart,String addTimeEnd,String publishTimeStart,String publishTimeEnd, Pageable pageable);
 
     @Query(nativeQuery = true, value = "select b.* from book b where b.id = ?1")
