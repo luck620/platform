@@ -7,8 +7,10 @@ import com.plantform.entity.Teacher;
 import com.plantform.repository.CourseRepository;
 import com.plantform.repository.TeacherRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.expression.spel.ast.NullLiteral;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -30,9 +32,15 @@ public class TeacherController {
         return teacherRepository.findAllType();
     }
 
+    public static <T> Page<T> listConvertToPage1(List<T> list, Pageable pageable) {
+        int start = (int)pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
+        return new PageImpl<T>(list.subList(start, end), pageable, list.size());
+    }
+
     @ResponseBody
     @GetMapping("/getTeacherList/{pageNum}/{pageSize}")
-    public List<TeacherDTO> getTeacherList(@PathVariable("pageNum") Integer pageNum,
+    public Page<TeacherDTO> getTeacherList(@PathVariable("pageNum") Integer pageNum,
                                      @PathVariable("pageSize") Integer pageSize){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
         List<Teacher> teacherList = teacherRepository.findTeacherAll(pageable);
@@ -46,17 +54,23 @@ public class TeacherController {
                 teacherDTO.setTno(teacher.getTno());
                 teacherDTO.setMail(teacher.getMail());
                 teacherDTO.setPassword(teacher.getPassword());
-                teacherDTO.setCourseId(teacher.getCourse().getId());
-                teacherDTO.setCourseName(teacher.getCourse().getName());
+                if(teacher.getCourse() != null) {
+                    teacherDTO.setCourseId(teacher.getCourse().getId());
+                    teacherDTO.setCourseName(teacher.getCourse().getName());
+                }else{
+                    teacherDTO.setCourseName("");
+                }
                 teacherDTOList.add(teacherDTO);
             }
         }
-        return teacherDTOList;
+        Page<TeacherDTO> teacherDTOPage = listConvertToPage1(teacherDTOList, pageable);
+        return teacherDTOPage;
+
     }
 
     @ResponseBody
     @PostMapping("/getTeacherListByOthers/{pageNum}/{pageSize}")
-    public List<TeacherDTO> getTeacherListByOthers(@PathVariable("pageNum") Integer pageNum,
+    public Page<TeacherDTO> getTeacherListByOthers(@PathVariable("pageNum") Integer pageNum,
                                           @PathVariable("pageSize") Integer pageSize,
                                           @RequestBody TeacherDTO teacherDTO){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
@@ -77,12 +91,17 @@ public class TeacherController {
                 teacherDTO1.setTno(teacher.getTno());
                 teacherDTO1.setMail(teacher.getMail());
                 teacherDTO1.setPassword(teacher.getPassword());
-                teacherDTO1.setCourseId(teacher.getCourse().getId());
-                teacherDTO1.setCourseName(teacher.getCourse().getName());
+                if(teacher.getCourse() != null) {
+                    teacherDTO1.setCourseId(teacher.getCourse().getId());
+                    teacherDTO1.setCourseName(teacher.getCourse().getName());
+                }else{
+                    teacherDTO1.setCourseName("");
+                }
                 teacherDTOList.add(teacherDTO1);
             }
         }
-        return teacherDTOList;
+        Page<TeacherDTO> teacherDTOPage = listConvertToPage1(teacherDTOList, pageable);
+        return teacherDTOPage;
     }
 
     @ResponseBody
@@ -117,8 +136,12 @@ public class TeacherController {
         teacherDTO.setTno(teacher.getTno());
         teacherDTO.setMail(teacher.getMail());
         teacherDTO.setPassword(teacher.getPassword());
-        teacherDTO.setCourseId(teacher.getCourse().getId());
-        teacherDTO.setCourseName(teacher.getCourse().getName());
+        if(teacher.getCourse() != null) {
+            teacherDTO.setCourseId(teacher.getCourse().getId());
+            teacherDTO.setCourseName(teacher.getCourse().getName());
+        }else{
+            teacherDTO.setCourseName("");
+        }
         return teacherDTO;
     }
 

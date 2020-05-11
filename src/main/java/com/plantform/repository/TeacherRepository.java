@@ -1,15 +1,11 @@
 package com.plantform.repository;
 
-import com.plantform.dto.TeacherDTO;
-import com.plantform.entity.Book;
 import com.plantform.entity.Course;
 import com.plantform.entity.Teacher;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import sun.security.krb5.internal.PAEncTSEnc;
 
 import javax.transaction.Transactional;
 import java.util.List;

@@ -21,7 +21,7 @@ public class Course {
     @Column
     private Integer stuNumber;//课程最大开设人数
 
-    @ManyToMany
+    @ManyToMany()
     @JSONField(serialize = false)
     @JoinTable(name = "sc",
             joinColumns = @JoinColumn(name = "cid"),
