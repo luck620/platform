@@ -25,10 +25,10 @@ public class StudentController {
     @Resource
     StudentRepository studentRepository;
 
-    public static <T> Page<T> listConvertToPage1(List<T> list, Pageable pageable) {
+    public static <T> Page<T> listConvertToPage1(List<T> list,int totalElements, Pageable pageable) {
         int start = (int)pageable.getOffset();
         int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
-        return new PageImpl<T>(list.subList(start, end), pageable, list.size());
+        return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
     }
 
     @ResponseBody
@@ -36,7 +36,8 @@ public class StudentController {
     public Page<Student> getTeacherList(@PathVariable("pageNum") Integer pageNum,
                                            @PathVariable("pageSize") Integer pageSize){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
-        List<Student> studentList = studentRepository.findStudentAll(pageable);
+        List<Student> studentList = studentRepository.findStudentAll();
+        int totalElements = studentRepository.findStudentAllCount();
         List<Student> studentList1 = new ArrayList<>();
         if(studentList!=null && !studentList.isEmpty()) {
             for (Student student : studentList) {
@@ -51,7 +52,7 @@ public class StudentController {
                 studentList1.add(student1);
             }
         }
-        Page<Student> studentPage = listConvertToPage1(studentList1, pageable);
+        Page<Student> studentPage = listConvertToPage1(studentList1, totalElements, pageable);
         return studentPage;
     }
 
@@ -62,7 +63,8 @@ public class StudentController {
                                                    @RequestBody Student student){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
         System.out.println("name="+student.getName()+" sno="+student.getSno()+" phone="+student.getPhone()+" mail="+student.getMail()+" grade="+student.getGrade());
-        List<Student> studentList = studentRepository.findAllByOthers(student.getName(),student.getSno(),student.getPhone(),student.getMail(),student.getGrade(),pageable);
+        List<Student> studentList = studentRepository.findAllByOthers(student.getName(),student.getSno(),student.getPhone(),student.getMail(),student.getGrade());
+        int totalElements = studentRepository.findAllByOthersCount(student.getName(),student.getSno(),student.getPhone(),student.getMail(),student.getGrade());
         List<Student> studentList1 = new ArrayList<>();
         if(studentList!=null && !studentList.isEmpty()) {
             for (Student stu : studentList) {
@@ -77,7 +79,7 @@ public class StudentController {
                 studentList1.add(student1);
             }
         }
-        Page<Student> studentPage = listConvertToPage1(studentList1, pageable);
+        Page<Student> studentPage = listConvertToPage1(studentList1, totalElements, pageable);
         return studentPage;
     }
 

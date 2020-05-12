@@ -32,41 +32,41 @@ public class TeacherController {
         return teacherRepository.findAllType();
     }
 
-    public static <T> Page<T> listConvertToPage1(List<T> list, Pageable pageable) {
+    public static <T> Page<T> listConvertToPage1(List<T> list,int totalElements, Pageable pageable) {
         int start = (int)pageable.getOffset();
         int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
-        return new PageImpl<T>(list.subList(start, end), pageable, list.size());
+        return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
     }
 
-    @ResponseBody
-    @GetMapping("/getTeacherList/{pageNum}/{pageSize}")
-    public Page<TeacherDTO> getTeacherList(@PathVariable("pageNum") Integer pageNum,
-                                     @PathVariable("pageSize") Integer pageSize){
-        Pageable pageable = PageRequest.of(pageNum,pageSize);
-        List<Teacher> teacherList = teacherRepository.findTeacherAll(pageable);
-        List<TeacherDTO> teacherDTOList = new ArrayList<>();
-        if(teacherList!=null && !teacherList.isEmpty()) {
-            for (Teacher teacher : teacherList) {
-                TeacherDTO teacherDTO = new TeacherDTO();
-                teacherDTO.setId(teacher.getId());
-                teacherDTO.setName(teacher.getName());
-                teacherDTO.setPhone(teacher.getPhone());
-                teacherDTO.setTno(teacher.getTno());
-                teacherDTO.setMail(teacher.getMail());
-                teacherDTO.setPassword(teacher.getPassword());
-                if(teacher.getCourse() != null) {
-                    teacherDTO.setCourseId(teacher.getCourse().getId());
-                    teacherDTO.setCourseName(teacher.getCourse().getName());
-                }else{
-                    teacherDTO.setCourseName("");
-                }
-                teacherDTOList.add(teacherDTO);
-            }
-        }
-        Page<TeacherDTO> teacherDTOPage = listConvertToPage1(teacherDTOList, pageable);
-        return teacherDTOPage;
-
-    }
+//    @ResponseBody
+//    @GetMapping("/getTeacherList/{pageNum}/{pageSize}")
+//    public Page<TeacherDTO> getTeacherList(@PathVariable("pageNum") Integer pageNum,
+//                                     @PathVariable("pageSize") Integer pageSize){
+//        Pageable pageable = PageRequest.of(pageNum,pageSize);
+//        List<Teacher> teacherList = teacherRepository.findTeacherAll(pageable);
+//        List<TeacherDTO> teacherDTOList = new ArrayList<>();
+//        if(teacherList!=null && !teacherList.isEmpty()) {
+//            for (Teacher teacher : teacherList) {
+//                TeacherDTO teacherDTO = new TeacherDTO();
+//                teacherDTO.setId(teacher.getId());
+//                teacherDTO.setName(teacher.getName());
+//                teacherDTO.setPhone(teacher.getPhone());
+//                teacherDTO.setTno(teacher.getTno());
+//                teacherDTO.setMail(teacher.getMail());
+//                teacherDTO.setPassword(teacher.getPassword());
+//                if(teacher.getCourse() != null) {
+//                    teacherDTO.setCourseId(teacher.getCourse().getId());
+//                    teacherDTO.setCourseName(teacher.getCourse().getName());
+//                }else{
+//                    teacherDTO.setCourseName("");
+//                }
+//                teacherDTOList.add(teacherDTO);
+//            }
+//        }
+//        Page<TeacherDTO> teacherDTOPage = listConvertToPage1(teacherDTOList, pageable);
+//        return teacherDTOPage;
+//
+//    }
 
     @ResponseBody
     @PostMapping("/getTeacherListByOthers/{pageNum}/{pageSize}")
@@ -80,7 +80,9 @@ public class TeacherController {
         String mail = teacherDTO.getMail();
         String courseName = teacherDTO.getCourseName();
         System.out.println("name="+name+" phone="+phone+" tno="+tno+" mail="+mail+" courseName="+courseName);
-        List<Teacher> teacherList = teacherRepository.findAllByOthers(name,phone,tno,mail,courseName,pageable);
+        List<Teacher> teacherList = teacherRepository.findAllByOthers(name,phone,tno,mail,courseName);
+        int totalElements = teacherRepository.findAllByOthersCount(name,phone,tno,mail,courseName);
+        System.out.println("totalElements="+totalElements);
         List<TeacherDTO> teacherDTOList = new ArrayList<>();
         if(teacherList!=null && !teacherList.isEmpty()) {
             for (Teacher teacher : teacherList) {
@@ -100,7 +102,7 @@ public class TeacherController {
                 teacherDTOList.add(teacherDTO1);
             }
         }
-        Page<TeacherDTO> teacherDTOPage = listConvertToPage1(teacherDTOList, pageable);
+        Page<TeacherDTO> teacherDTOPage = listConvertToPage1(teacherDTOList,totalElements, pageable);
         return teacherDTOPage;
     }
 

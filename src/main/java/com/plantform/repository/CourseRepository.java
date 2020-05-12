@@ -12,13 +12,22 @@ import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Query(nativeQuery = true, value="select c.* from course c")
-    List<Course> findCourseAll(Pageable pageable);
+    List<Course> findCourseAll();
+
+    @Query(nativeQuery = true, value="select count(c.id) from course c")
+    int findCourseAllCount();
 
     @Query(nativeQuery = true, value = "SELECT c.* from course c " +
             "where case when ?1='' then 1=1 else c.name like %?1% end " +
             "and case when ?2='' then 1=1 else c.use_book like %?2% end " +
             "and case when ?3='' then 1=1 else c.stu_number between ?3 and ?4 end ")
-    List<Course> findAllByOthers(String name,String useBook, int numberStart, int numberEnd, Pageable pageable);
+    List<Course> findAllByOthers(String name,String useBook, int numberStart, int numberEnd);
+
+    @Query(nativeQuery = true, value = "SELECT count(c.id) from course c " +
+            "where case when ?1='' then 1=1 else c.name like %?1% end " +
+            "and case when ?2='' then 1=1 else c.use_book like %?2% end " +
+            "and case when ?3='' then 1=1 else c.stu_number between ?3 and ?4 end ")
+    int findAllByOthersCount(String name,String useBook, int numberStart, int numberEnd);
 
     @Query(nativeQuery = true, value = "select c.* from course c where c.id = ?1")
     Course findCourseById(int id);

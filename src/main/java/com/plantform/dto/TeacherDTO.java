@@ -12,6 +12,7 @@ public class TeacherDTO {
     String password;
     Course course;
     int courseId;
+    int totalElements;
 
     public int getId() {
         return id;
@@ -83,5 +84,13 @@ public class TeacherDTO {
 
     public void setCourseId(int courseId) {
         this.courseId = courseId;
+    }
+
+    public int getTotalElements() {
+        return totalElements;
+    }
+
+    public void setTotalElements(int totalElements) {
+        this.totalElements = totalElements;
     }
 }
