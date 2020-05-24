@@ -6,10 +6,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface ThemeRepository extends JpaRepository<Theme,Integer> {
     @Query(nativeQuery = true,value = "select t.* from theme t where t.type='important'")
-    Page<Theme> findThemeByImportant(Pageable pageable);
+    List<Theme> findThemeByImportant();
+
+    @Query(nativeQuery = true,value = "select td.title from theme_detail td where td.theme_id = ?1")
+    List<String> findThemeDetailTitle(int id);
 
     @Query(nativeQuery = true,value = "select t.* from theme t where t.type='others'")
-    Page<Theme> findThemeByOthers(Pageable pageable);
+    List<Theme> findThemeByOthers();
 }

@@ -1,9 +1,11 @@
 package com.plantform.controller;
 
 import com.plantform.dto.Image;
+import com.plantform.entity.Course;
 import com.plantform.entity.News;
 import com.plantform.repository.NewsRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,12 @@ import java.util.List;
 public class NewsController {
     @Resource
     NewsRepository newsRepository;
+
+    public static <T> Page<T> listConvertToPage1(List<T> list, int totalElements, Pageable pageable) {
+        int start = (int)pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
+        return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
+    }
 
     @ResponseBody
     @GetMapping("/findAllImportant/{pageNum}/{pageSize}")
@@ -32,6 +40,38 @@ public class NewsController {
                               @PathVariable("pageSize") Integer pageSize){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
         return newsRepository.findAllByTypeOthers(pageable);
+    }
+
+    //根据关键词搜索新闻信息
+    @ResponseBody
+    @GetMapping("/findAllByKeyWords/{pageNum}/{pageSize}/{newsKeyWords}")
+    public Page<News> findAllByKeyWords(@PathVariable("pageNum") Integer pageNum,
+                                    @PathVariable("pageSize") Integer pageSize,
+                                    @PathVariable("newsKeyWords") String newsKeyWords){
+        if(newsKeyWords == null){
+            newsKeyWords = "";
+        }
+        System.out.println("newsKeyWords="+newsKeyWords);
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<News> newsList = newsRepository.findAllByKeyWords(newsKeyWords);
+        int totalElements = newsRepository.findAllByKeyWordsCount(newsKeyWords);
+        System.out.println("totalElements="+totalElements);
+        List<News> newsList1 = new ArrayList<>();
+        if(newsList!=null &&!newsList.isEmpty()){
+            for(News news : newsList){
+                News news1 = new News();
+                news1.setId(news.getId());
+                news1.setAuthor(news.getAuthor());
+                news1.setContent(news.getContent());
+                news1.setDate(news.getDate());
+                news1.setSource(news.getSource());
+                news1.setTitle(news.getTitle());
+                news1.setType(news.getType());
+                newsList1.add(news1);
+            }
+        }
+        Page<News> newsPage = listConvertToPage1(newsList1, totalElements, pageable);
+        return newsPage;
     }
 
     @ResponseBody
@@ -156,5 +196,19 @@ public class NewsController {
     public List<News> findTeachByType(@PathVariable("type") String type) {
         System.out.println("type="+type);
         return newsRepository.findTeachByType(type);
+    }
+
+    @ResponseBody
+    @GetMapping("/findActivityByType/{type}")
+    public List<News> findActivityByType(@PathVariable("type") String type) {
+        System.out.println("type="+type);
+        return newsRepository.findActivityByType(type);
+    }
+
+    @ResponseBody
+    @GetMapping("/findUniversityByType/{type}")
+    public List<News> findUniversityByType(@PathVariable("type") String type) {
+        System.out.println("type="+type);
+        return newsRepository.findUniversityByType(type);
     }
 }
