@@ -6,15 +6,17 @@ import com.plantform.entity.Book;
 import com.plantform.entity.MyResult;
 import com.plantform.repository.BookRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import sun.management.snmp.jvminstr.JvmThreadInstanceEntryImpl;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.TimeZone;
 
 @RestController
 @RequestMapping("/book")
@@ -25,6 +27,69 @@ public class BookController {
     @Resource
     BookRepository bookRepository;
 
+    public static <T> Page<T> listConvertToPage1(List<T> list, int totalElements, Pageable pageable) {
+        int start = (int)pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
+        return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
+    }
+
+    //拿出所有数据
+    @ResponseBody
+    @GetMapping("/findAllByType/{pageNum}/{pageSize}/{type}")
+    public Page<Book> findAllByType(@PathVariable("pageNum") Integer pageNum,
+                                    @PathVariable("pageSize") Integer pageSize,
+                                    @PathVariable("type") String type){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Book> bookList =  bookRepository.findAllByType(type);
+        int toltalElements = bookRepository.findAllByTypeCount(type);
+        List<Book> bookList1 = new ArrayList<>();
+        if(bookList != null && !bookList.isEmpty()){
+            for(Book book : bookList){
+                Book book1 = new Book();
+                book1.setId(book.getId());
+                book1.setPublishTime(book.getPublishTime());
+                book1.setPublish(book.getPublish());
+                book1.setImageUrl(book.getImageUrl());
+                book1.setType(book.getType());
+                book1.setName(book.getName());
+                book1.setAuthor(book.getAuthor());
+                book1.setIntroduction(book.getIntroduction());
+                book1.setISBN(book.getISBN());
+                bookList1.add(book1);
+            }
+        }
+        Page<Book> bookPage = listConvertToPage1(bookList1, toltalElements, pageable);
+        return bookPage;
+    }
+
+    //搜索图书资源
+    @ResponseBody
+    @GetMapping("/findBooksByKeyWords/{pageNum}/{pageSize}/{bookKeysWords}")
+    public Page<Book> findBooksByKeyWords(@PathVariable("pageNum") Integer pageNum,
+                                    @PathVariable("pageSize") Integer pageSize,
+                                    @PathVariable("bookKeysWords") String bookKeysWords){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Book> bookList =  bookRepository.findBooksByKeyWords(bookKeysWords);
+        int toltalElements = bookRepository.findBooksByKeyWordsCount(bookKeysWords);
+        List<Book> bookList1 = new ArrayList<>();
+        if(bookList != null && !bookList.isEmpty()){
+            for(Book book : bookList){
+                Book book1 = new Book();
+                book1.setId(book.getId());
+                book1.setPublishTime(book.getPublishTime());
+                book1.setPublish(book.getPublish());
+                book1.setImageUrl(book.getImageUrl());
+                book1.setType(book.getType());
+                book1.setName(book.getName());
+                book1.setAuthor(book.getAuthor());
+                book1.setIntroduction(book.getIntroduction());
+                book1.setISBN(book.getISBN());
+                bookList1.add(book1);
+            }
+        }
+        Page<Book> bookPage = listConvertToPage1(bookList1, toltalElements, pageable);
+        return bookPage;
+    }
 
     @ResponseBody
     @GetMapping("/findAllType")

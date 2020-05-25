@@ -20,7 +20,16 @@ public class Book {
     private String name;
 
     @Column
+    private String author;
+
+    @Column
+    private String ISBN;
+
+    @Column
     private String publish;
+
+    @Column(columnDefinition="text")
+    private String introduction;
 
     @Column
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -32,6 +41,9 @@ public class Book {
 
     @Column
     private String type;
+
+    @Column
+    private String imageUrl;
 
     public int getId() {
         return id;
@@ -79,5 +91,37 @@ public class Book {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getISBN() {
+        return ISBN;
+    }
+
+    public void setISBN(String ISBN) {
+        this.ISBN = ISBN;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

@@ -14,6 +14,18 @@ public interface BookRepository extends JpaRepository<Book,Integer> {
     @Query(nativeQuery = true,value = "select distinct b.type from book b")
     List<String> findAllType();
 
+    @Query(nativeQuery = true,value = "select b.* from book b where b.type = ?1")
+    List<Book> findAllByType(String type);
+
+    @Query(nativeQuery = true,value = "select b.* from book b where b.name like %?1% ")
+    List<Book> findBooksByKeyWords(String name);
+
+    @Query(nativeQuery = true,value = "select count(b.id) from book b where b.name like %?1% ")
+    int findBooksByKeyWordsCount(String name);
+
+    @Query(nativeQuery = true,value = "select count(b.id) from book b where b.type = ?1")
+    int findAllByTypeCount(String type);
+
     @Query(nativeQuery = true, value = "SELECT b.* FROM book b " +
             "WHERE CASE WHEN ?1='' THEN 1=1 ELSE b.name LIKE %?1% END " +
             "AND CASE WHEN ?2='' THEN 1=1 ELSE b.publish LIKE %?2% END " +
