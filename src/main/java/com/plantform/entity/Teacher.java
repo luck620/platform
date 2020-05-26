@@ -3,6 +3,8 @@ package com.plantform.entity;
 import com.alibaba.fastjson.annotation.JSONField;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 public class Teacher {
@@ -25,10 +27,9 @@ public class Teacher {
     @Column
     private String password;
 
+    @OneToMany(mappedBy = "teacher")
     @JSONField(serialize = false)
-    @ManyToOne()
-    @JoinColumn(name = "course_id")
-    private Course course;
+    private Set<Course> courses = new HashSet<>();
 
     public int getId() {
         return id;
@@ -78,11 +79,11 @@ public class Teacher {
         this.password = password;
     }
 
-    public Course getCourse() {
-        return course;
+    public Set<Course> getCourses() {
+        return courses;
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
     }
 }

@@ -1,5 +1,6 @@
 package com.plantform.repository;
 
+import com.plantform.entity.Account;
 import com.plantform.entity.Course;
 import com.plantform.entity.Student;
 import com.plantform.entity.Teacher;
@@ -13,6 +14,12 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 public interface StudentRepository extends JpaRepository<Student,Integer> {
+    @Query(nativeQuery = true, value = "select s.* from student s where s.phone=?1 and s.password=?2")
+    Student getStudentBy(String phone, String password);
+
+    @Query(nativeQuery = true, value = "select s.* from student s where s.id=?1")
+    Student checkInfo(int id);
+
     @Query(nativeQuery = true,value = "select s.* from student s inner join sc c on c.sid = s.id where c.cid = ?1 " +
             "and case when ?2='' then 1=1 else s.name like %?2% end " +
             "and case when ?3='' then 1=1 else s.sno like %?3% end " +

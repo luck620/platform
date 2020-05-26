@@ -93,12 +93,12 @@ public class TeacherController {
                 teacherDTO1.setTno(teacher.getTno());
                 teacherDTO1.setMail(teacher.getMail());
                 teacherDTO1.setPassword(teacher.getPassword());
-                if(teacher.getCourse() != null) {
-                    teacherDTO1.setCourseId(teacher.getCourse().getId());
-                    teacherDTO1.setCourseName(teacher.getCourse().getName());
-                }else{
-                    teacherDTO1.setCourseName("");
-                }
+//                if(teacher.getCourse() != null) {
+//                    teacherDTO1.setCourseId(teacher.getCourse().getId());
+//                    teacherDTO1.setCourseName(teacher.getCourse().getName());
+//                }else{
+//                    teacherDTO1.setCourseName("");
+//                }
                 teacherDTOList.add(teacherDTO1);
             }
         }
@@ -118,7 +118,7 @@ public class TeacherController {
         teacher.setPassword(teacherDTO.getPassword());
         String courseName = teacherDTO.getCourseName();
         Course course = courseRepository.findCourseByName(courseName);
-        teacher.setCourse(course);
+//        teacher.setCourse(course);
         Teacher teacher1 = teacherRepository.save(teacher);
         if(teacher1 != null){
             myResult.setCode(200);
@@ -138,13 +138,30 @@ public class TeacherController {
         teacherDTO.setTno(teacher.getTno());
         teacherDTO.setMail(teacher.getMail());
         teacherDTO.setPassword(teacher.getPassword());
-        if(teacher.getCourse() != null) {
-            teacherDTO.setCourseId(teacher.getCourse().getId());
-            teacherDTO.setCourseName(teacher.getCourse().getName());
-        }else{
-            teacherDTO.setCourseName("");
-        }
+//        if(teacher.getCourse() != null) {
+//            teacherDTO.setCourseId(teacher.getCourse().getId());
+//            teacherDTO.setCourseName(teacher.getCourse().getName());
+//        }else{
+//            teacherDTO.setCourseName("");
+//        }
         return teacherDTO;
+    }
+
+    //完善信息
+    @ResponseBody
+    @PostMapping("/consummateTeacherById/{id}")
+    public MyResult consummateTeacherById(@PathVariable("id") int id,
+                                    @RequestBody TeacherDTO editForm){
+        System.out.println("id="+id+" name="+editForm.getName()+" tno="+editForm.getTno()+" getMail="+editForm.getMail());
+        int result = teacherRepository.consummate(editForm.getName(),editForm.getTno(),editForm.getMail(),id);
+        System.out.println("result= "+result);
+        MyResult myResult = new MyResult();
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("完善成功");
+            return myResult;
+        }
+        return myResult;
     }
 
     @ResponseBody

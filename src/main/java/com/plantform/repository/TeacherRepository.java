@@ -1,5 +1,6 @@
 package com.plantform.repository;
 
+import com.plantform.entity.Account;
 import com.plantform.entity.Course;
 import com.plantform.entity.Teacher;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +12,12 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 public interface TeacherRepository extends JpaRepository<Teacher,Integer> {
+    @Query(nativeQuery = true, value = "select t.* from teacher t where t.phone=?1 and t.password=?2")
+    Teacher getTeacherBy(String phone, String password);
+
+    @Query(nativeQuery = true, value = "select t.* from teacher t where t.id=?1")
+    Teacher checkInfo(int id);
+
     @Query(nativeQuery = true,value = "select t.* from teacher t where t.course_id = ?1 " +
             "and case when ?2='' then 1=1 else t.name like %?2% end " +
             "and case when ?3='' then 1=1 else t.tno like %?3% end " +
@@ -53,4 +60,9 @@ public interface TeacherRepository extends JpaRepository<Teacher,Integer> {
     @Modifying
     @Transactional
     int update(String name, String phone, String tno, String mail, String password, Course course, int id);
+
+    @Query(nativeQuery = true, value = "update teacher t set t.name=?1,t.tno=?2,t.mail=?3 where t.id=?4 ")
+    @Modifying
+    @Transactional
+    int consummate(String name, String tno, String mail, int id);
 }

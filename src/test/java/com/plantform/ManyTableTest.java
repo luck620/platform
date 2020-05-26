@@ -20,12 +20,12 @@ public class ManyTableTest {
         Teacher teacher3 = new Teacher();
         teacher1.setName("李老师");
 
-        Course course1 = new Course();
-        course1.setName("语文");
-        teacher1.setCourse(course1);
+//        Course course1 = new Course();
+//        course1.setName("语文");
+//        teacher1.setCourse(course1);
 
-        Course course2 = new Course();
-        course1.setName("数学");
+//        Course course2 = new Course();
+//        course1.setName("数学");
 
         Student student1 = new Student();
         student1.setName("小明");

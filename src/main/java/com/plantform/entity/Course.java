@@ -21,16 +21,17 @@ public class Course {
     @Column
     private Integer stuNumber;//课程最大开设人数
 
+    @JSONField(serialize = false)
+    @ManyToOne()
+    @JoinColumn(name = "teacher_id")
+    private Teacher teacher;
+
     @ManyToMany()
     @JSONField(serialize = false)
     @JoinTable(name = "sc",
             joinColumns = @JoinColumn(name = "cid"),
             inverseJoinColumns = @JoinColumn(name = "sid"))
     private Set<Student> students = new HashSet<>();
-
-    @OneToMany(mappedBy = "course")
-    @JSONField(serialize = false)
-    private Set<Teacher> teachers = new HashSet<>();
 
     public Integer getId() {
         return id;
@@ -72,11 +73,15 @@ public class Course {
         this.students = students;
     }
 
-    public Set<Teacher> getTeachers() {
-        return teachers;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setTeachers(Set<Teacher> teachers) {
-        this.teachers = teachers;
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        this.teacher = teacher;
     }
 }

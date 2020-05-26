@@ -1,10 +1,8 @@
 package com.plantform.controller;
 
+import com.plantform.dto.RegisterDTO;
 import com.plantform.dto.TeacherDTO;
-import com.plantform.entity.Course;
-import com.plantform.entity.MyResult;
-import com.plantform.entity.Student;
-import com.plantform.entity.Teacher;
+import com.plantform.entity.*;
 import com.plantform.repository.CourseRepository;
 import com.plantform.repository.StudentRepository;
 import com.plantform.repository.TeacherRepository;
@@ -16,7 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.jar.JarOutputStream;
 
 @RestController
 @RequestMapping("/student")
@@ -24,6 +25,90 @@ import java.util.List;
 public class StudentController {
     @Resource
     StudentRepository studentRepository;
+
+    @Resource
+    TeacherRepository teacherRepository;
+
+    //登陆
+    @ResponseBody
+    @PostMapping("/login")
+    public MyResult login(@RequestBody Student student){
+        MyResult myResult = new MyResult();
+        System.out.println(student.getPhone()+" "+student.getPassword());
+        Student student1 =  studentRepository.getStudentBy(student.getPhone(),student.getPassword());
+        Teacher teacher = teacherRepository.getTeacherBy(student.getPhone(),student.getPassword());
+//        System.out.println(student1.getId()+" "+teacher.getId());
+        Map<String,Object> m = new HashMap<String,Object>();
+        System.out.println(student1 == null);
+        if(student1 != null && teacher == null) {
+            m.put("studentId",student1.getId());
+            String token = JavaWebToken.createJavaWebToken(m);                // 根据存在用户的id生成token字符串
+            myResult.setCode(200);
+            myResult.setMsg("登陆成功");
+            myResult.setToken(token);
+            myResult.setLoginType("student");
+            myResult.setLoginId(student1.getId());
+        }
+        if(teacher != null && student1 == null){
+            m.put("teacher",teacher.getId());
+            String token = JavaWebToken.createJavaWebToken(m);                // 根据存在用户的id生成token字符串
+            myResult.setCode(200);
+            myResult.setMsg("登陆成功");
+            myResult.setToken(token);
+            myResult.setLoginType("teacher");
+            myResult.setLoginId(teacher.getId());
+        }
+        return myResult;
+    }
+
+    //注册
+    @ResponseBody
+    @PostMapping("/register")
+    public MyResult register(@RequestBody RegisterDTO registerDTO){
+        MyResult myResult = new MyResult();
+        System.out.println(registerDTO.getPhone()+" "+registerDTO.getPassword()+" "+registerDTO.getType());
+        //如果是学生注册的话
+        if(registerDTO.getType().equals("student")){
+            Student student = new Student();
+            student.setPhone(registerDTO.getPhone());
+            student.setPassword(registerDTO.getPassword());
+            Student student1 = studentRepository.save(student);
+            if(student1 != null){
+                myResult.setCode(200);
+                myResult.setMsg("注册成功");
+            }
+        }else if(registerDTO.getType().equals("teacher")){
+            Teacher teacher = new Teacher();
+            teacher.setPhone(registerDTO.getPhone());
+            teacher.setPassword(registerDTO.getPassword());
+            Teacher teacher1 = teacherRepository.save(teacher);
+            if(teacher1 != null){
+                myResult.setCode(200);
+                myResult.setMsg("注册成功");
+            }
+        }
+        return myResult;
+    }
+
+    //查验个人信息是否完善
+    @ResponseBody
+    @GetMapping("/checkInfo/{type}/{id}")
+    public Boolean checkInfo(@PathVariable("type")String type , @PathVariable("id") int id){
+        Boolean b = true;
+        if(type.equals("student")){
+            Student student = studentRepository.checkInfo(id);
+            if(student.getGrade() == null || student.getMail() == null || student.getSno() == null || student.getName() == null){
+                b = false;
+            }
+        }
+        if(type.equals("teacher")){
+            Teacher teacher = teacherRepository.checkInfo(id);
+            if(teacher.getMail() == null || teacher.getTno() == null || teacher.getName() == null){
+                b = false;
+            }
+        }
+        return b;
+    }
 
     public static <T> Page<T> listConvertToPage1(List<T> list,int totalElements, Pageable pageable) {
         int start = (int)pageable.getOffset();
