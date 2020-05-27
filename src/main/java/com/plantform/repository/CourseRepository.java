@@ -11,6 +11,15 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value="insert into course(courseno,name,description,image_url,week_num,period_num,teacher_id) values(?1,?2,?3,?4,?5,?6,?7)")
+    int addCourseByTeacher(String courseNO,String name,String description,String imageUrl,int weekNum,int periodNum,int id);
+
+    @Query(nativeQuery = true, value="select c.id from course c where c.courseno = ?1")
+    List<Integer> findByCourseNO(String courseNO);
+
+
     @Query(nativeQuery = true, value="select c.* from course c")
     List<Course> findCourseAll();
 

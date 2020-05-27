@@ -11,11 +11,20 @@ public class TeacherDTO {
     String courseName;
     String password;
     Course course;
+    String imageUrl;
     int courseId;
     int totalElements;
 
     public int getId() {
         return id;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
     }
 
     public void setId(int id) {

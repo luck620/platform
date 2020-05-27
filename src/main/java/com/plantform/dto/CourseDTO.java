@@ -1,11 +1,33 @@
 package com.plantform.dto;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 public class CourseDTO {
-    int id;
-    String name;
-    String useBook;
-    int numberStart;
-    int numberEnd;
+    private int id;
+
+    private String name;
+
+    private String imageUrl;
+
+    private String description;
+
+    private int weekNum;//周数
+
+    private int periodNum;//课时
+
+    private String testUrl;//测验
+
+    private String courseNO;
+
+    public String getCourseNO() {
+        return courseNO;
+    }
+
+    public void setCourseNO(String courseNO) {
+        this.courseNO = courseNO;
+    }
 
     public int getId() {
         return id;
@@ -23,27 +45,43 @@ public class CourseDTO {
         this.name = name;
     }
 
-    public String getUseBook() {
-        return useBook;
+    public String getImageUrl() {
+        return imageUrl;
     }
 
-    public void setUseBook(String useBook) {
-        this.useBook = useBook;
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
-    public int getNumberStart() {
-        return numberStart;
+    public String getDescription() {
+        return description;
     }
 
-    public void setNumberStart(int numberStart) {
-        this.numberStart = numberStart;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public int getNumberEnd() {
-        return numberEnd;
+    public int getWeekNum() {
+        return weekNum;
     }
 
-    public void setNumberEnd(int numberEnd) {
-        this.numberEnd = numberEnd;
+    public void setWeekNum(int weekNum) {
+        this.weekNum = weekNum;
+    }
+
+    public int getPeriodNum() {
+        return periodNum;
+    }
+
+    public void setPeriodNum(int periodNum) {
+        this.periodNum = periodNum;
+    }
+
+    public String getTestUrl() {
+        return testUrl;
+    }
+
+    public void setTestUrl(String testUrl) {
+        this.testUrl = testUrl;
     }
 }

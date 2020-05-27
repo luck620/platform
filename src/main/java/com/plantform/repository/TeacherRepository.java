@@ -65,4 +65,9 @@ public interface TeacherRepository extends JpaRepository<Teacher,Integer> {
     @Modifying
     @Transactional
     int consummate(String name, String tno, String mail, int id);
+
+    @Query(nativeQuery = true, value = "update teacher t set t.image_url=?1 where t.id=?2 ")
+    @Modifying
+    @Transactional
+    int changeHead(String imageUrl , int id);
 }

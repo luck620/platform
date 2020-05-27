@@ -30,6 +30,9 @@ public class Student {
     @Column
     private String password;
 
+    @Column
+    private String imageUrl;
+
 
     public int getId() {
         return id;
@@ -87,4 +90,11 @@ public class Student {
         this.password = password;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

@@ -2,9 +2,11 @@ package com.plantform.controller;
 
 import com.plantform.dto.CourseDTO;
 import com.plantform.dto.CourseDetailDTO;
+import com.plantform.dto.PeriodDTO;
 import com.plantform.dto.TeacherDTO;
 import com.plantform.entity.*;
 import com.plantform.repository.CourseRepository;
+import com.plantform.repository.PeriodRepository;
 import com.plantform.repository.StudentRepository;
 import com.plantform.repository.TeacherRepository;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import javax.xml.transform.Result;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +33,52 @@ public class CourseController {
     @Resource
     StudentRepository studentRepository;
 
+    @Resource
+    PeriodRepository periodRepository;
+
+    //教师添加课程
+    @ResponseBody
+    @PostMapping("/addCourseByTeacher/{id}/{imageURL}")
+    public MyResult addCourseByTeacher(@PathVariable("id") int id,
+                                     @PathVariable("imageURL")String imageURL,
+                                     @RequestBody CourseDTO courseDTO){
+        String imageUrl = "http://qaath1lbd.bkt.clouddn.com/" + imageURL;
+        int result = courseRepository.addCourseByTeacher(courseDTO.getCourseNO(),courseDTO.getName(),courseDTO.getDescription(),imageUrl,courseDTO.getWeekNum(),courseDTO.getPeriodNum(),id);
+        List<Integer> courseId = courseRepository.findByCourseNO(courseDTO.getCourseNO());
+        System.out.println("courseId="+courseId.get(0));
+        for(int i=1;i<=courseDTO.getWeekNum();i++){
+            for(int j=1;j<=courseDTO.getPeriodNum();j++){
+                periodRepository.addPeriod("第"+j+"课时","第"+i+"周",courseId.get(0));
+            }
+        }
+        MyResult myResult = new MyResult();
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("创建成功");
+            return myResult;
+        }
+        return null;
+    }
+
+    //查询课程课时，以便上传视频
+    @ResponseBody
+    @GetMapping("/getInfo/{courseNO}")
+    public List<PeriodDTO> getInfo(@PathVariable("courseNO")String courseNO){
+        System.out.println("courseNO="+courseNO);
+        List<String> weekList = periodRepository.getWeekST(courseNO);
+        List<PeriodDTO> periodDTOList = new ArrayList<>();
+        if(weekList.size() > 0 ){
+            for(String weekST : weekList){
+                PeriodDTO periodDTO = new PeriodDTO();
+                List<String> periodList = periodRepository.getPeriodST(weekST,courseNO);
+                periodDTO.setWeekST(weekST);
+                periodDTO.setPeriodList(periodList);
+                periodDTOList.add(periodDTO);
+            }
+        }
+        return periodDTOList;
+    }
+
     //课程详情---课程
     @ResponseBody
     @GetMapping("/findCourseDetail/{id}")
@@ -36,7 +86,6 @@ public class CourseController {
         Course courseDetail = new Course();
         Course course = courseRepository.findCourseById(id);
         courseDetail.setId(course.getId());
-        courseDetail.setStuNumber(course.getStuNumber());
         courseDetail.setName(course.getName());
         return  courseDetail;
     }
@@ -109,9 +158,7 @@ public class CourseController {
             for(Course course: courseList){
                 Course course1 = new Course();
                 course1.setId(course.getId());
-                course1.setStuNumber(course.getStuNumber());
                 course1.setName(course.getName());
-                course1.setUseBook(course.getUseBook());
                 courseList1.add(course1);
             }
         }
@@ -119,39 +166,36 @@ public class CourseController {
         return coursePage;
     }
 
-    @ResponseBody
-    @PostMapping("/getCourseListByOthers/{pageNum}/{pageSize}")
-    public Page<Course> getCourseListByOthers(@PathVariable("pageNum") Integer pageNum,
-                                          @PathVariable("pageSize") Integer pageSize,
-                                          @RequestBody CourseDTO courseDTO){
-        Pageable pageable = PageRequest.of(pageNum,pageSize);
-        String name = courseDTO.getName();
-        String useBook = courseDTO.getUseBook();
-        int numberStart = courseDTO.getNumberStart();
-        int numberEnd = courseDTO.getNumberEnd();
-        System.out.println("name="+name+" useBook="+useBook+" numberStart="+numberStart+" numberEnd="+numberEnd);
-        List<Course> courseList =  courseRepository.findAllByOthers(name,useBook,numberStart,numberEnd);
-        int totalElements = courseRepository.findAllByOthersCount(name,useBook,numberStart,numberEnd);
-        List<Course> courseList1 = new ArrayList<>();
-        if(courseList!=null &&!courseList.isEmpty()){
-            for(Course course: courseList){
-                Course course1 = new Course();
-                course1.setId(course.getId());
-                course1.setStuNumber(course.getStuNumber());
-                course1.setName(course.getName());
-                course1.setUseBook(course.getUseBook());
-                courseList1.add(course1);
-            }
-        }
-        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
-        return coursePage;
-    }
+//    @ResponseBody
+//    @PostMapping("/getCourseListByOthers/{pageNum}/{pageSize}")
+//    public Page<Course> getCourseListByOthers(@PathVariable("pageNum") Integer pageNum,
+//                                          @PathVariable("pageSize") Integer pageSize,
+//                                          @RequestBody CourseDTO courseDTO){
+//        Pageable pageable = PageRequest.of(pageNum,pageSize);
+//        String name = courseDTO.getName();
+//        String useBook = courseDTO.getUseBook();
+//        int numberStart = courseDTO.getNumberStart();
+//        int numberEnd = courseDTO.getNumberEnd();
+//        System.out.println("name="+name+" useBook="+useBook+" numberStart="+numberStart+" numberEnd="+numberEnd);
+//        List<Course> courseList =  courseRepository.findAllByOthers(name,useBook,numberStart,numberEnd);
+//        int totalElements = courseRepository.findAllByOthersCount(name,useBook,numberStart,numberEnd);
+//        List<Course> courseList1 = new ArrayList<>();
+//        if(courseList!=null &&!courseList.isEmpty()){
+//            for(Course course: courseList){
+//                Course course1 = new Course();
+//                course1.setId(course.getId());
+//                course1.setName(course.getName());
+//                courseList1.add(course1);
+//            }
+//        }
+//        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+//        return coursePage;
+//    }
 
     @ResponseBody
     @PostMapping("/addCourse")
     public MyResult addCourse(@RequestBody Course course){
         MyResult myResult = new MyResult();
-        course.setStuNumber(0);
         Course course1 = courseRepository.save(course);
         if(course1 != null){
             myResult.setCode(200);
@@ -167,26 +211,24 @@ public class CourseController {
         Course course1 = new Course();
         course1.setId(course.getId());
         course1.setName(course.getName());
-        course1.setUseBook(course.getUseBook());
-        course1.setStuNumber(course.getStuNumber());
         return course1;
     }
 
-    @ResponseBody
-    @PostMapping("/editCourseById/{id}")
-    public MyResult editCourseById(@PathVariable("id") int id,
-                                 @RequestBody CourseDTO editForm){
-        System.out.println("id="+id+" name="+editForm.getName()+" useBook="+editForm.getUseBook());
-        int result = courseRepository.update(editForm.getName(),editForm.getUseBook(),id);
-        System.out.println("result= "+result);
-        MyResult myResult = new MyResult();
-        if(result == 1){
-            myResult.setCode(200);
-            myResult.setMsg("修改成功");
-            return myResult;
-        }
-        return null;
-    }
+//    @ResponseBody
+//    @PostMapping("/editCourseById/{id}")
+//    public MyResult editCourseById(@PathVariable("id") int id,
+//                                 @RequestBody CourseDTO editForm){
+//        System.out.println("id="+id+" name="+editForm.getName()+" useBook="+editForm.getUseBook());
+//        int result = courseRepository.update(editForm.getName(),editForm.getUseBook(),id);
+//        System.out.println("result= "+result);
+//        MyResult myResult = new MyResult();
+//        if(result == 1){
+//            myResult.setCode(200);
+//            myResult.setMsg("修改成功");
+//            return myResult;
+//        }
+//        return null;
+//    }
 
     @ResponseBody
     @GetMapping("/deleteCourseById/{id}")

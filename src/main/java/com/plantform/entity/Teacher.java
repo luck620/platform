@@ -27,6 +27,9 @@ public class Teacher {
     @Column
     private String password;
 
+    @Column
+    private String imageUrl;
+
     @OneToMany(mappedBy = "teacher")
     @JSONField(serialize = false)
     private Set<Course> courses = new HashSet<>();
@@ -85,5 +88,13 @@ public class Teacher {
 
     public void setCourses(Set<Course> courses) {
         this.courses = courses;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

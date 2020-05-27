@@ -38,36 +38,6 @@ public class TeacherController {
         return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
     }
 
-//    @ResponseBody
-//    @GetMapping("/getTeacherList/{pageNum}/{pageSize}")
-//    public Page<TeacherDTO> getTeacherList(@PathVariable("pageNum") Integer pageNum,
-//                                     @PathVariable("pageSize") Integer pageSize){
-//        Pageable pageable = PageRequest.of(pageNum,pageSize);
-//        List<Teacher> teacherList = teacherRepository.findTeacherAll(pageable);
-//        List<TeacherDTO> teacherDTOList = new ArrayList<>();
-//        if(teacherList!=null && !teacherList.isEmpty()) {
-//            for (Teacher teacher : teacherList) {
-//                TeacherDTO teacherDTO = new TeacherDTO();
-//                teacherDTO.setId(teacher.getId());
-//                teacherDTO.setName(teacher.getName());
-//                teacherDTO.setPhone(teacher.getPhone());
-//                teacherDTO.setTno(teacher.getTno());
-//                teacherDTO.setMail(teacher.getMail());
-//                teacherDTO.setPassword(teacher.getPassword());
-//                if(teacher.getCourse() != null) {
-//                    teacherDTO.setCourseId(teacher.getCourse().getId());
-//                    teacherDTO.setCourseName(teacher.getCourse().getName());
-//                }else{
-//                    teacherDTO.setCourseName("");
-//                }
-//                teacherDTOList.add(teacherDTO);
-//            }
-//        }
-//        Page<TeacherDTO> teacherDTOPage = listConvertToPage1(teacherDTOList, pageable);
-//        return teacherDTOPage;
-//
-//    }
-
     @ResponseBody
     @PostMapping("/getTeacherListByOthers/{pageNum}/{pageSize}")
     public Page<TeacherDTO> getTeacherListByOthers(@PathVariable("pageNum") Integer pageNum,
@@ -138,6 +108,7 @@ public class TeacherController {
         teacherDTO.setTno(teacher.getTno());
         teacherDTO.setMail(teacher.getMail());
         teacherDTO.setPassword(teacher.getPassword());
+        teacherDTO.setImageUrl(teacher.getImageUrl());
 //        if(teacher.getCourse() != null) {
 //            teacherDTO.setCourseId(teacher.getCourse().getId());
 //            teacherDTO.setCourseName(teacher.getCourse().getName());
@@ -154,6 +125,24 @@ public class TeacherController {
                                     @RequestBody TeacherDTO editForm){
         System.out.println("id="+id+" name="+editForm.getName()+" tno="+editForm.getTno()+" getMail="+editForm.getMail());
         int result = teacherRepository.consummate(editForm.getName(),editForm.getTno(),editForm.getMail(),id);
+        System.out.println("result= "+result);
+        MyResult myResult = new MyResult();
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("完善成功");
+            return myResult;
+        }
+        return myResult;
+    }
+
+    //更换头像
+    @ResponseBody
+    @GetMapping("/changeHeadById/{id}/{imageURL}")
+    public MyResult changeHeadById(@PathVariable("id") int id,
+                                   @PathVariable("imageURL") String imageURL){
+        System.out.println("id="+id+" imageURL="+imageURL);
+        String imageUrl = "http://qaath1lbd.bkt.clouddn.com/" + imageURL;
+        int result = teacherRepository.changeHead(imageUrl,id);
         System.out.println("result= "+result);
         MyResult myResult = new MyResult();
         if(result == 1){
