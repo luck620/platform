@@ -19,9 +19,33 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Query(nativeQuery = true, value="select c.id from course c where c.courseno = ?1")
     List<Integer> findByCourseNO(String courseNO);
 
+    @Query(nativeQuery = true, value="select c.* from course c where c.teacher_id = ?1")
+    List<Course> findCourseAllByTeacherId(int id);
+
+    @Query(nativeQuery = true, value="select count(c.id) from course c where c.teacher_id = ?1")
+    int findCourseAllByTeacherIdCount(int id);
+
+    @Query(nativeQuery = true, value="select c.* from course c inner join sc s on s.c_id = c.id where s.s_id = ?1")
+    List<Course>  findCourseListWithStuId(int id);
+
+    @Query(nativeQuery = true, value="select count(c.id) from course c inner join sc s on s.c_id = c.id where s.s_id = ?1")
+    int findCourseListWithStuIdCount(int id);
+
 
     @Query(nativeQuery = true, value="select c.* from course c")
     List<Course> findCourseAll();
+
+    @Query(nativeQuery = true, value="select c.* from course c inner join sc s on s.c_id = c.id where c.test_url is not null and s.s_id = ?1")
+    List<Course> findCourseStuTest(int id);
+
+    @Query(nativeQuery = true, value="select count(c.id) from course c inner join sc s on s.c_id = c.id where c.test_url is not null and s.s_id = ?1")
+    int findCourseTestStuCount(int id);
+
+    @Query(nativeQuery = true, value="select c.* from course c where c.test_url is not null and c.teacher_id = ?1")
+    List<Course> findCourseTest(int id);
+
+    @Query(nativeQuery = true, value="select count(c.id) from course c where c.test_url is not null and c.teacher_id = ?1")
+    int findCourseTestCount(int id);
 
     @Query(nativeQuery = true, value="select count(c.id) from course c")
     int findCourseAllCount();
@@ -48,4 +72,9 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Modifying
     @Transactional
     int update(String name, String useBook,int id);
+
+    @Query(nativeQuery = true, value = "update course c set c.test_url=?1 where c.id=?2 ")
+    @Modifying
+    @Transactional
+    int updateCourseTest(String wordUrl,int id);
 }

@@ -42,11 +42,15 @@ public class Course {
     @JSONField(serialize = false)
     private Set<Period> periods = new HashSet<>();
 
+    @OneToMany(mappedBy = "course")
+    @JSONField(serialize = false)
+    private Set<Notice> notices = new HashSet<>();
+
     @ManyToMany()
     @JSONField(serialize = false)
     @JoinTable(name = "sc",
-            joinColumns = @JoinColumn(name = "cid"),
-            inverseJoinColumns = @JoinColumn(name = "sid"))
+            joinColumns = @JoinColumn(name = "cId"),
+            inverseJoinColumns = @JoinColumn(name = "sId"))
     private Set<Student> students = new HashSet<>();
 
     public String getCourseNO() {

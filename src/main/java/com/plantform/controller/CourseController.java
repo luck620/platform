@@ -1,14 +1,8 @@
 package com.plantform.controller;
 
-import com.plantform.dto.CourseDTO;
-import com.plantform.dto.CourseDetailDTO;
-import com.plantform.dto.PeriodDTO;
-import com.plantform.dto.TeacherDTO;
+import com.plantform.dto.*;
 import com.plantform.entity.*;
-import com.plantform.repository.CourseRepository;
-import com.plantform.repository.PeriodRepository;
-import com.plantform.repository.StudentRepository;
-import com.plantform.repository.TeacherRepository;
+import com.plantform.repository.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +13,9 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 import javax.xml.transform.Result;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/course")
@@ -42,6 +38,7 @@ public class CourseController {
     public MyResult addCourseByTeacher(@PathVariable("id") int id,
                                      @PathVariable("imageURL")String imageURL,
                                      @RequestBody CourseDTO courseDTO){
+        System.out.println(courseDTO.getCourseNO()+courseDTO.getName()+courseDTO.getPeriodNum()+courseDTO.getWeekNum()+courseDTO.getDescription());
         String imageUrl = "http://qaath1lbd.bkt.clouddn.com/" + imageURL;
         int result = courseRepository.addCourseByTeacher(courseDTO.getCourseNO(),courseDTO.getName(),courseDTO.getDescription(),imageUrl,courseDTO.getWeekNum(),courseDTO.getPeriodNum(),id);
         List<Integer> courseId = courseRepository.findByCourseNO(courseDTO.getCourseNO());
@@ -70,9 +67,19 @@ public class CourseController {
         if(weekList.size() > 0 ){
             for(String weekST : weekList){
                 PeriodDTO periodDTO = new PeriodDTO();
-                List<String> periodList = periodRepository.getPeriodST(weekST,courseNO);
+                List<PeriodSTDTO> periodSTDTOList = new ArrayList<>();
+                List<Period> periodList = periodRepository.getPeriodST(weekST,courseNO);
+                if(periodList.size() > 0 ){
+                    for(Period period : periodList){
+                        PeriodSTDTO periodSTDTO = new PeriodSTDTO();
+                        periodSTDTO.setId(period.getId());
+                        periodSTDTO.setPeriodST(period.getPeriodST());
+                        periodSTDTO.setVideoUrl(period.getVideoUrl());
+                        periodSTDTOList.add(periodSTDTO);
+                    }
+                }
                 periodDTO.setWeekST(weekST);
-                periodDTO.setPeriodList(periodList);
+                periodDTO.setPeriodList(periodSTDTOList);
                 periodDTOList.add(periodDTO);
             }
         }
@@ -147,6 +154,60 @@ public class CourseController {
     }
 
     @ResponseBody
+    @GetMapping("/getCourseListWithStuId/{pageNum}/{pageSize}/{id}")
+    public Page<Course> getCourseListWithStuId(@PathVariable("pageNum") Integer pageNum,
+                                                 @PathVariable("pageSize") Integer pageSize,
+                                                 @PathVariable("id")int id){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Course> courseList =  courseRepository.findCourseListWithStuId(id);
+        int totalElements = courseRepository.findCourseListWithStuIdCount(id);
+        List<Course> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                Course course1 = new Course();
+                course1.setId(course.getId());
+                course1.setName(course.getName());
+                course1.setImageUrl(course.getImageUrl());
+                course1.setCourseNO(course.getCourseNO());
+                course1.setDescription(course.getDescription());
+                course1.setPeriodNum(course.getPeriodNum());
+                course1.setWeekNum(course.getWeekNum());
+                course1.setTestUrl(course.getTestUrl());
+                courseList1.add(course1);
+            }
+        }
+        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+        return coursePage;
+    }
+
+    @ResponseBody
+    @GetMapping("/getCourseListByTeacherId/{pageNum}/{pageSize}/{id}")
+    public Page<Course> getCourseListByTeacherId(@PathVariable("pageNum") Integer pageNum,
+                                                 @PathVariable("pageSize") Integer pageSize,
+                                                 @PathVariable("id")int id){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Course> courseList =  courseRepository.findCourseAllByTeacherId(id);
+        int totalElements = courseRepository.findCourseAllByTeacherIdCount(id);
+        List<Course> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                Course course1 = new Course();
+                course1.setId(course.getId());
+                course1.setName(course.getName());
+                course1.setImageUrl(course.getImageUrl());
+                course1.setCourseNO(course.getCourseNO());
+                course1.setDescription(course.getDescription());
+                course1.setPeriodNum(course.getPeriodNum());
+                course1.setWeekNum(course.getWeekNum());
+                course1.setTestUrl(course.getTestUrl());
+                courseList1.add(course1);
+            }
+        }
+        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+        return coursePage;
+    }
+
+    @ResponseBody
     @GetMapping("/getCourseList/{pageNum}/{pageSize}")
     public Page<Course> getCourseList(@PathVariable("pageNum") Integer pageNum,
                                   @PathVariable("pageSize") Integer pageSize){
@@ -159,6 +220,12 @@ public class CourseController {
                 Course course1 = new Course();
                 course1.setId(course.getId());
                 course1.setName(course.getName());
+                course1.setImageUrl(course.getImageUrl());
+                course1.setCourseNO(course.getCourseNO());
+                course1.setDescription(course.getDescription());
+                course1.setPeriodNum(course.getPeriodNum());
+                course1.setWeekNum(course.getWeekNum());
+                course1.setTestUrl(course.getTestUrl());
                 courseList1.add(course1);
             }
         }
@@ -166,31 +233,123 @@ public class CourseController {
         return coursePage;
     }
 
-//    @ResponseBody
-//    @PostMapping("/getCourseListByOthers/{pageNum}/{pageSize}")
-//    public Page<Course> getCourseListByOthers(@PathVariable("pageNum") Integer pageNum,
-//                                          @PathVariable("pageSize") Integer pageSize,
-//                                          @RequestBody CourseDTO courseDTO){
-//        Pageable pageable = PageRequest.of(pageNum,pageSize);
-//        String name = courseDTO.getName();
-//        String useBook = courseDTO.getUseBook();
-//        int numberStart = courseDTO.getNumberStart();
-//        int numberEnd = courseDTO.getNumberEnd();
-//        System.out.println("name="+name+" useBook="+useBook+" numberStart="+numberStart+" numberEnd="+numberEnd);
-//        List<Course> courseList =  courseRepository.findAllByOthers(name,useBook,numberStart,numberEnd);
-//        int totalElements = courseRepository.findAllByOthersCount(name,useBook,numberStart,numberEnd);
-//        List<Course> courseList1 = new ArrayList<>();
-//        if(courseList!=null &&!courseList.isEmpty()){
-//            for(Course course: courseList){
-//                Course course1 = new Course();
-//                course1.setId(course.getId());
-//                course1.setName(course.getName());
-//                courseList1.add(course1);
-//            }
-//        }
-//        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
-//        return coursePage;
-//    }
+    @ResponseBody
+    @GetMapping("/getCourseListWithoutPage")
+    public List<Course> getCourseList(){
+        List<Course> courseList =  courseRepository.findAll();
+        List<Course> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                Course course1 = new Course();
+                course1.setId(course.getId());
+                course1.setName(course.getName());
+                course1.setImageUrl(course.getImageUrl());
+                course1.setCourseNO(course.getCourseNO());
+                course1.setDescription(course.getDescription());
+                course1.setPeriodNum(course.getPeriodNum());
+                course1.setWeekNum(course.getWeekNum());
+                course1.setTestUrl(course.getTestUrl());
+                courseList1.add(course1);
+            }
+        }
+        return courseList1;
+    }
+
+    //学生获取作业资源
+    @ResponseBody
+    @GetMapping("/getCourseTestByStuId/{pageNum}/{pageSize}/{id}")
+    public Page<Course> getCourseTestByStuId(@PathVariable("pageNum") Integer pageNum,
+                                             @PathVariable("pageSize") Integer pageSize,
+                                             @PathVariable("id") int id){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Course> courseList =  courseRepository.findCourseStuTest(id);
+        int totalElements = courseRepository.findCourseTestStuCount(id);
+        List<Course> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                Course course1 = new Course();
+                course1.setId(course.getId());
+                course1.setName(course.getName());
+                course1.setImageUrl(course.getImageUrl());
+                course1.setCourseNO(course.getCourseNO());
+                course1.setDescription(course.getDescription());
+                course1.setPeriodNum(course.getPeriodNum());
+                course1.setWeekNum(course.getWeekNum());
+                course1.setTestUrl(course.getTestUrl());
+                courseList1.add(course1);
+            }
+        }
+        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+        return coursePage;
+    }
+
+    //教师获取作业资源
+    @ResponseBody
+    @GetMapping("/getCourseTestByTeaId/{pageNum}/{pageSize}/{id}")
+    public Page<Course> getCourseTestByTeaId(@PathVariable("pageNum") Integer pageNum,
+                                      @PathVariable("pageSize") Integer pageSize,
+                                             @PathVariable("id") int id){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Course> courseList =  courseRepository.findCourseTest(id);
+        int totalElements = courseRepository.findCourseTestCount(id);
+        List<Course> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                Course course1 = new Course();
+                course1.setId(course.getId());
+                course1.setName(course.getName());
+                course1.setImageUrl(course.getImageUrl());
+                course1.setCourseNO(course.getCourseNO());
+                course1.setDescription(course.getDescription());
+                course1.setPeriodNum(course.getPeriodNum());
+                course1.setWeekNum(course.getWeekNum());
+                course1.setTestUrl(course.getTestUrl());
+                courseList1.add(course1);
+            }
+        }
+        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+        return coursePage;
+    }
+
+    //发布作业
+    @ResponseBody
+    @GetMapping("/addCourseTest/{id}/{wordURL}")
+    public MyResult addCourseTest(@PathVariable("id")int id,
+                                  @PathVariable("wordURL")String wordURL){
+        String wordUrl = "http://qaath1lbd.bkt.clouddn.com/"+wordURL;
+        MyResult myResult = new MyResult();
+        int result = courseRepository.updateCourseTest(wordUrl,id);
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("发布作业成功");
+            return myResult;
+        }
+        return myResult;
+    }
+
+    //学生选择课程
+    @ResponseBody
+    @GetMapping("/chooseCourse/{id}/{courseId}")
+    public MyResult chooseCourse(@PathVariable("id")int id,
+                                  @PathVariable("courseId")int courseId){
+        Student student = studentRepository.findStudentById(id);
+        Set<Student> studentSet = new HashSet<>();
+        studentSet.add(student);
+        Course course = courseRepository.findCourseById(courseId);
+        course.setStudents(studentSet);
+        courseRepository.save(course);
+//        scRepository.save(sc);
+//        System.out.println("id="+id+"courseID="+courseId);
+//         new MyResult();
+        MyResult myResult = new MyResult();
+        int result = 1;
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("选课成功");
+            return myResult;
+        }
+        return myResult;
+    }
 
     @ResponseBody
     @PostMapping("/addCourse")

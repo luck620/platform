@@ -4,7 +4,7 @@ import java.util.List;
 
 public class PeriodDTO {
     private String weekST;
-    private List<String> periodList;
+    private List<PeriodSTDTO> periodList;
     public String getWeekST() {
         return weekST;
     }
@@ -13,11 +13,11 @@ public class PeriodDTO {
         this.weekST = weekST;
     }
 
-    public List<String> getPeriodList() {
+    public List<PeriodSTDTO> getPeriodList() {
         return periodList;
     }
 
-    public void setPeriodList(List<String> periodList) {
+    public void setPeriodList(List<PeriodSTDTO> periodList) {
         this.periodList = periodList;
     }
 }

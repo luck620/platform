@@ -14,9 +14,15 @@ public interface PeriodRepository extends JpaRepository<Period, Integer> {
     @Query(nativeQuery = true, value = "insert into period(periodst,weekst,course_id) values(?1,?2,?3)")
     int addPeriod(String periodST, String weekST, int id);
 
-    @Query(nativeQuery = true, value = "select p.periodst from period p inner join course c on p.course_id=c.id where p.weekst=?1 and c.courseno=?2")
-    List<String> getPeriodST(String weekST, String courseNO);
+    @Query(nativeQuery = true, value = "select p.* from period p inner join course c on p.course_id=c.id where p.weekst=?1 and c.courseno=?2")
+    List<Period> getPeriodST(String weekST, String courseNO);
 
     @Query(nativeQuery = true, value = "select distinct(p.weekst) from period p inner join course c on p.course_id=c.id where c.courseno=?1")
     List<String> getWeekST(String courseNO);
+
+    @Modifying
+    @Transactional
+    @Query(nativeQuery = true, value = "update period p set p.video_url=?1 where p.id=?2")
+    int updatePeriod(String videoUrl, int id);
+
 }

@@ -1,6 +1,7 @@
 package com.plantform.controller;
 
 import com.plantform.dto.RegisterDTO;
+import com.plantform.dto.StudentDTO;
 import com.plantform.dto.TeacherDTO;
 import com.plantform.entity.*;
 import com.plantform.repository.CourseRepository;
@@ -37,9 +38,8 @@ public class StudentController {
         System.out.println(student.getPhone()+" "+student.getPassword());
         Student student1 =  studentRepository.getStudentBy(student.getPhone(),student.getPassword());
         Teacher teacher = teacherRepository.getTeacherBy(student.getPhone(),student.getPassword());
-//        System.out.println(student1.getId()+" "+teacher.getId());
         Map<String,Object> m = new HashMap<String,Object>();
-        System.out.println(student1 == null);
+        //判断是学生还是教师用户登录，学生用户登陆返回学生类型至前端，教师则返回教师类型
         if(student1 != null && teacher == null) {
             m.put("studentId",student1.getId());
             String token = JavaWebToken.createJavaWebToken(m);                // 根据存在用户的id生成token字符串
@@ -57,6 +57,24 @@ public class StudentController {
             myResult.setToken(token);
             myResult.setLoginType("teacher");
             myResult.setLoginId(teacher.getId());
+        }
+        return myResult;
+    }
+
+    //更换头像
+    @ResponseBody
+    @GetMapping("/changeHeadById/{id}/{imageURL}")
+    public MyResult changeHeadById(@PathVariable("id") int id,
+                                   @PathVariable("imageURL") String imageURL){
+        System.out.println("id="+id+" imageURL="+imageURL);
+        String imageUrl = "http://qaath1lbd.bkt.clouddn.com/" + imageURL;
+        int result = studentRepository.changeHead(imageUrl,id);
+        System.out.println("result= "+result);
+        MyResult myResult = new MyResult();
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("完善成功");
+            return myResult;
         }
         return myResult;
     }
@@ -118,7 +136,7 @@ public class StudentController {
 
     @ResponseBody
     @GetMapping("/getStudentList/{pageNum}/{pageSize}")
-    public Page<Student> getTeacherList(@PathVariable("pageNum") Integer pageNum,
+    public Page<Student> getStudentList(@PathVariable("pageNum") Integer pageNum,
                                            @PathVariable("pageSize") Integer pageSize){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
         List<Student> studentList = studentRepository.findStudentAll();
@@ -134,6 +152,7 @@ public class StudentController {
                 student1.setPassword(student.getPassword());
                 student1.setPhone(student.getPhone());
                 student1.setSno(student.getSno());
+                student1.setImageUrl(student.getImageUrl());
                 studentList1.add(student1);
             }
         }
@@ -161,6 +180,7 @@ public class StudentController {
                 student1.setPassword(stu.getPassword());
                 student1.setPhone(stu.getPhone());
                 student1.setSno(stu.getSno());
+                student1.setImageUrl(stu.getImageUrl());
                 studentList1.add(student1);
             }
         }
@@ -199,7 +219,26 @@ public class StudentController {
         student1.setMail(student.getMail());
         student1.setPassword(student.getPassword());
         student1.setGrade(student.getGrade());
+        student1.setImageUrl(student.getImageUrl());
         return student1;
+    }
+
+
+    //完善信息
+    @ResponseBody
+    @PostMapping("/consummateStudentById/{id}")
+    public MyResult consummateStudentById(@PathVariable("id") int id,
+                                          @RequestBody StudentDTO editForm){
+        System.out.println("id="+id+" name="+editForm.getName()+" sno="+editForm.getSno()+" getMail="+editForm.getMail());
+        int result = studentRepository.consummate(editForm.getName(),editForm.getSno(),editForm.getMail(),id);
+        System.out.println("result= "+result);
+        MyResult myResult = new MyResult();
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("完善成功");
+            return myResult;
+        }
+        return myResult;
     }
 
     @ResponseBody

@@ -26,6 +26,7 @@ public class NewsController {
         return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
     }
 
+    //获取新闻数据
     @ResponseBody
     @GetMapping("/findAllImportant/{pageNum}/{pageSize}")
     public Page<News> findAllImportant(@PathVariable("pageNum") Integer pageNum,

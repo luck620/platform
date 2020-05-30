@@ -65,4 +65,15 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
     @Modifying
     @Transactional
     int update(String name, String sno, String phone, String mail, String grade, String password, int id);
+
+    @Query(nativeQuery = true, value = "update student s set s.name=?1,s.sno=?2,s.mail=?3 where s.id=?4 ")
+    @Modifying
+    @Transactional
+    int consummate(String name, String sno, String mail, int id);
+
+    @Query(nativeQuery = true, value = "update student s set s.image_url=?1 where s.id=?2 ")
+    @Modifying
+    @Transactional
+    int changeHead(String imageUrl , int id);
+
 }
