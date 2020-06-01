@@ -33,6 +33,9 @@ public class Course {
     @Column
     private String courseNO;//课程号
 
+    @Column
+    String stuNum;
+
     @JSONField(serialize = false)
     @ManyToOne()
     @JoinColumn(name = "teacher_id")
@@ -44,14 +47,18 @@ public class Course {
 
     @OneToMany(mappedBy = "course")
     @JSONField(serialize = false)
-    private Set<Notice> notices = new HashSet<>();
+    private Set<Exam> exams = new HashSet<>();
 
-    @ManyToMany()
+    @OneToMany(mappedBy = "course")
     @JSONField(serialize = false)
-    @JoinTable(name = "sc",
-            joinColumns = @JoinColumn(name = "cId"),
-            inverseJoinColumns = @JoinColumn(name = "sId"))
-    private Set<Student> students = new HashSet<>();
+    private Set<Notice> notices = new HashSet<>();
+//
+//    @ManyToMany()
+//    @JSONField(serialize = false)
+//    @JoinTable(name = "sc",
+//            joinColumns = @JoinColumn(name = "courseId"),
+//            inverseJoinColumns = @JoinColumn(name = "studentId"))
+//    private Set<Student> students = new HashSet<>();
 
     public String getCourseNO() {
         return courseNO;
@@ -73,17 +80,41 @@ public class Course {
         return name;
     }
 
+    public String getStuNum() {
+        return stuNum;
+    }
+
+    public void setStuNum(String stuNum) {
+        this.stuNum = stuNum;
+    }
+
+    public Set<Exam> getExams() {
+        return exams;
+    }
+
+    public void setExams(Set<Exam> exams) {
+        this.exams = exams;
+    }
+
+    public Set<Notice> getNotices() {
+        return notices;
+    }
+
+    public void setNotices(Set<Notice> notices) {
+        this.notices = notices;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
 
-    public Set<Student> getStudents() {
-        return students;
-    }
-
-    public void setStudents(Set<Student> students) {
-        this.students = students;
-    }
+//    public Set<Student> getStudents() {
+//        return students;
+//    }
+//
+//    public void setStudents(Set<Student> students) {
+//        this.students = students;
+//    }
 
     public void setId(int id) {
         this.id = id;

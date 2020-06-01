@@ -32,6 +32,34 @@ public class CourseController {
     @Resource
     PeriodRepository periodRepository;
 
+    @Resource
+    ExamRepository examRepository;
+
+    @Resource
+    ScRepository scRepository;
+
+    //教师添加测验
+    @ResponseBody
+    @PostMapping("/addCourseExam")
+    public MyResult addCourseExam(@RequestBody ExamDTO examDTO){
+        System.out.println("选择题数量="+examDTO.getType1Num()+"填空题数量="+examDTO.getType2Num()+"课程id="+examDTO.getCourseId());
+        if(examDTO.getType1Num() > 0 ){
+            for(int i=1; i<=examDTO.getType1Num(); i++){
+                examRepository.addExamByType1("选择题",examDTO.getCourseId());
+            }
+        }
+        if(examDTO.getType2Num() > 0 ){
+            for(int i=1; i<=examDTO.getType2Num(); i++){
+                examRepository.addExamByType2("判断题",examDTO.getCourseId());
+            }
+        }
+        MyResult myResult = new MyResult();
+        myResult.setCode(200);
+        myResult.setMsg("成功");
+        return myResult;
+    }
+
+
     //教师添加课程
     @ResponseBody
     @PostMapping("/addCourseByTeacher/{id}/{imageURL}")
@@ -262,8 +290,15 @@ public class CourseController {
                                              @PathVariable("pageSize") Integer pageSize,
                                              @PathVariable("id") int id){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
-        List<Course> courseList =  courseRepository.findCourseStuTest(id);
-        int totalElements = courseRepository.findCourseTestStuCount(id);
+        List<Integer> courseIdList =  courseRepository.findCourseStuExam(id);
+        int totalElements = courseRepository.findCourseExamStuCount(id);
+        List<Course> courseList = new ArrayList<>();
+        if(courseIdList.size() > 0 ){
+            for(Integer courseId: courseIdList){
+                Course course = courseRepository.findCourseById(courseId);
+                courseList.add(course);
+            }
+        }
         List<Course> courseList1 = new ArrayList<>();
         if(courseList!=null &&!courseList.isEmpty()){
             for(Course course: courseList){
@@ -283,15 +318,23 @@ public class CourseController {
         return coursePage;
     }
 
-    //教师获取作业资源
+    //教师获取测验资源
     @ResponseBody
     @GetMapping("/getCourseTestByTeaId/{pageNum}/{pageSize}/{id}")
     public Page<Course> getCourseTestByTeaId(@PathVariable("pageNum") Integer pageNum,
                                       @PathVariable("pageSize") Integer pageSize,
                                              @PathVariable("id") int id){
         Pageable pageable = PageRequest.of(pageNum,pageSize);
-        List<Course> courseList =  courseRepository.findCourseTest(id);
-        int totalElements = courseRepository.findCourseTestCount(id);
+        List<Integer> courseIdList =  courseRepository.findCourseExam(id);
+        List<Course> courseList = new ArrayList<>();
+        if(courseIdList.size() > 0 ){
+            for(Integer courseId: courseIdList){
+                Course course = courseRepository.findCourseById(courseId);
+                courseList.add(course);
+            }
+        }
+
+        int totalElements = courseRepository.findCourseExamCount(id);
         List<Course> courseList1 = new ArrayList<>();
         if(courseList!=null &&!courseList.isEmpty()){
             for(Course course: courseList){
@@ -309,6 +352,62 @@ public class CourseController {
         }
         Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
         return coursePage;
+    }
+
+    //按照选课人数排课程
+    @ResponseBody
+    @GetMapping("/getCourseListOrderBy/{pageNum}/{pageSize}")
+    public Page<Course> getCourseListOrderBy(@PathVariable("pageNum") Integer pageNum,
+                                             @PathVariable("pageSize") Integer pageSize){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Course> courseList =  courseRepository.findCourseOrderBy();
+        int totalElements = courseRepository.findCourseOrderByCount();
+        List<Course> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                Course course1 = new Course();
+                course1.setId(course.getId());
+                course1.setName(course.getName());
+                course1.setImageUrl(course.getImageUrl());
+                course1.setCourseNO(course.getCourseNO());
+                course1.setDescription(course.getDescription());
+                course1.setPeriodNum(course.getPeriodNum());
+                course1.setWeekNum(course.getWeekNum());
+                course1.setTestUrl(course.getTestUrl());
+                course1.setStuNum(course.getStuNum());
+                courseList1.add(course1);
+            }
+        }
+        Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+        return coursePage;
+    }
+
+    //查看课程学生成绩
+    @ResponseBody
+    @GetMapping("/getCourseGradeDetail/{pageNum}/{pageSize}/{id}")
+    public Page<SC> getCourseGradeDetail(@PathVariable("pageNum") Integer pageNum,
+                                             @PathVariable("pageSize") Integer pageSize,
+                                             @PathVariable("id")int id){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<sc> scList =  scRepository.getCourseGradeDetail(id);
+        int totalElements = scRepository.getCourseGradeDetailCount(id);
+        List<SC> scList1 = new ArrayList<>();
+        if(scList!=null &&!scList.isEmpty()){
+            for(sc sc: scList){
+                SC sc1 = new SC();
+                sc1.setcId(sc.getCourse().getId());
+                sc1.setsId(sc.getStudent().getId());
+                sc1.setScore(sc.getScore());
+                sc1.setGrade(sc.getStudent().getGrade());
+                sc1.setMail(sc.getStudent().getMail());
+                sc1.setName(sc.getStudent().getName());
+                sc1.setPhone(sc.getStudent().getPhone());
+                sc1.setSno(sc.getStudent().getSno());
+                scList1.add(sc1);
+            }
+        }
+        Page<SC> scPage = listConvertToPage1(scList1, totalElements, pageable);
+        return scPage;
     }
 
     //发布作业
@@ -332,17 +431,23 @@ public class CourseController {
     @GetMapping("/chooseCourse/{id}/{courseId}")
     public MyResult chooseCourse(@PathVariable("id")int id,
                                   @PathVariable("courseId")int courseId){
-        Student student = studentRepository.findStudentById(id);
-        Set<Student> studentSet = new HashSet<>();
-        studentSet.add(student);
-        Course course = courseRepository.findCourseById(courseId);
-        course.setStudents(studentSet);
-        courseRepository.save(course);
+        int result = scRepository.addSC(courseId,id);
+//        Student student = studentRepository.findStudentById(id);
+//        Set<Student> studentSet = new HashSet<>();
+//        studentSet.add(student);
+//        Course course = courseRepository.findCourseById(courseId);
+//        if(course.getStuNum() == null){
+//            course.setStuNum(1+"");
+//        }
+//        else{
+//            course.setStuNum((Integer.valueOf(course.getStuNum())+1)+"");
+//        }
+//        course.setStudents(studentSet);
+//        courseRepository.save(course);
 //        scRepository.save(sc);
 //        System.out.println("id="+id+"courseID="+courseId);
 //         new MyResult();
         MyResult myResult = new MyResult();
-        int result = 1;
         if(result == 1){
             myResult.setCode(200);
             myResult.setMsg("选课成功");

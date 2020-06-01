@@ -1,5 +1,6 @@
 package com.plantform.repository;
 
+import com.plantform.dto.SC;
 import com.plantform.entity.Course;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,6 +12,13 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
+
+    @Query(nativeQuery = true, value = "select s.* from sc s where s.course_id = ?1")
+    List<SC> getCourseGradeDetail(int id);
+
+    @Query(nativeQuery = true, value = "select count(s.id) from sc s where s.course_id = ?1")
+    int getCourseGradeDetailCount(int id);
+
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value="insert into course(courseno,name,description,image_url,week_num,period_num,teacher_id) values(?1,?2,?3,?4,?5,?6,?7)")
@@ -25,27 +33,45 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Query(nativeQuery = true, value="select count(c.id) from course c where c.teacher_id = ?1")
     int findCourseAllByTeacherIdCount(int id);
 
-    @Query(nativeQuery = true, value="select c.* from course c inner join sc s on s.c_id = c.id where s.s_id = ?1")
+    @Query(nativeQuery = true, value="select c.* from course c inner join sc s on s.course_id = c.id where s.student_id = ?1")
     List<Course>  findCourseListWithStuId(int id);
 
-    @Query(nativeQuery = true, value="select count(c.id) from course c inner join sc s on s.c_id = c.id where s.s_id = ?1")
+    @Query(nativeQuery = true, value="select count(c.id) from course c inner join sc s on s.course_id = c.id where s.student_id = ?1")
     int findCourseListWithStuIdCount(int id);
 
 
     @Query(nativeQuery = true, value="select c.* from course c")
     List<Course> findCourseAll();
 
-    @Query(nativeQuery = true, value="select c.* from course c inner join sc s on s.c_id = c.id where c.test_url is not null and s.s_id = ?1")
+    @Query(nativeQuery = true, value="select c.* from course c inner join sc s on s.course_id = c.id where c.test_url is not null and s.student_id = ?1")
     List<Course> findCourseStuTest(int id);
 
-    @Query(nativeQuery = true, value="select count(c.id) from course c inner join sc s on s.c_id = c.id where c.test_url is not null and s.s_id = ?1")
+    @Query(nativeQuery = true, value="select count(c.id) from course c inner join sc s on s.course_id = c.id where c.test_url is not null and s.student_id = ?1")
     int findCourseTestStuCount(int id);
+
+    @Query(nativeQuery = true, value="select distinct(c.id) from course c inner join sc s on s.course_id = c.id inner join exam e on e.course_id=c.id where s.student_id = ?1")
+    List<Integer> findCourseStuExam(int id);
+
+    @Query(nativeQuery = true, value="select count(distinct(c.id)) from course c inner join sc s on s.course_id = c.id inner join exam e on e.course_id=c.id where s.student_id = ?1")
+    int findCourseExamStuCount(int id);
 
     @Query(nativeQuery = true, value="select c.* from course c where c.test_url is not null and c.teacher_id = ?1")
     List<Course> findCourseTest(int id);
 
     @Query(nativeQuery = true, value="select count(c.id) from course c where c.test_url is not null and c.teacher_id = ?1")
     int findCourseTestCount(int id);
+
+    @Query(nativeQuery = true, value="select distinct(c.id) from course c inner join exam e on e.course_id=c.id where c.teacher_id = ?1")
+    List<Integer> findCourseExam(int id);
+
+    @Query(nativeQuery = true, value="select c.* from course c where c.stu_num is not null order by c.stu_num desc")
+    List<Course> findCourseOrderBy();
+
+    @Query(nativeQuery = true, value="select count(c.id) from course c where c.stu_num is not null order by c.stu_num desc")
+    int findCourseOrderByCount();
+
+    @Query(nativeQuery = true, value="select count(distinct(c.id)) from course c inner join exam e on e.course_id=c.id where c.teacher_id = ?1")
+    int findCourseExamCount(int id);
 
     @Query(nativeQuery = true, value="select count(c.id) from course c")
     int findCourseAllCount();
