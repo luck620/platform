@@ -17,10 +17,10 @@ public interface NoticeRepository extends JpaRepository<Notice,Integer> {
     @Query(nativeQuery = true, value = "select count(n.id) from notice n inner join course c on c.id = n.course_id where n.title is not null and c.teacher_id=?1")
     int getCourseNoticeCount(int id);
 
-    @Query(nativeQuery = true, value = "select n.* from notice n inner join course c on c.id = n.course_id inner join sc s on s.c_id = c.id where n.title is not null and s.s_id=?1")
+    @Query(nativeQuery = true, value = "select n.* from notice n inner join course c on c.id = n.course_id inner join sc s on s.course_id = c.id where n.title is not null and s.student_id=?1")
     List<Notice> getCourseStuNotice(int id);
 
-    @Query(nativeQuery = true, value = "select count(n.id) from notice n inner join course c on c.id = n.course_id inner join sc on sc.c_id = c.id where n.title is not null and sc.s_id=?1")
+    @Query(nativeQuery = true, value = "select count(n.id) from notice n inner join course c on c.id = n.course_id inner join sc on sc.course_id = c.id where n.title is not null and sc.student_id=?1")
     int getCourseStuNoticeCount(int id);
 
     @Modifying
