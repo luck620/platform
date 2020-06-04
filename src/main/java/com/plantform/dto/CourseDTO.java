@@ -21,6 +21,46 @@ public class CourseDTO {
 
     private String courseNO;
 
+    private String teacherName;
+
+    private String stuNum;
+
+    private int numberStart;
+
+    private int numberEnd;
+
+    public int getNumberStart() {
+        return numberStart;
+    }
+
+    public void setNumberStart(int numberStart) {
+        this.numberStart = numberStart;
+    }
+
+    public int getNumberEnd() {
+        return numberEnd;
+    }
+
+    public void setNumberEnd(int numberEnd) {
+        this.numberEnd = numberEnd;
+    }
+
+    public String getStuNum() {
+        return stuNum;
+    }
+
+    public void setStuNum(String stuNum) {
+        this.stuNum = stuNum;
+    }
+
+    public String getTeacherName() {
+        return teacherName;
+    }
+
+    public void setTeacherName(String teacherName) {
+        this.teacherName = teacherName;
+    }
+
     public String getCourseNO() {
         return courseNO;
     }

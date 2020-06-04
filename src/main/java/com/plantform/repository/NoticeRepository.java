@@ -31,4 +31,9 @@ public interface NoticeRepository extends JpaRepository<Notice,Integer> {
     @Query(nativeQuery = true, value = "select n.* from notice n where n.id = ?1")
     Notice findNoticeById(int id);
 
+    @Query(nativeQuery = true, value = "select n.* from notice n where n.course_id = ?1")
+    List<Notice> getNoticeByCourseId(int id);
+
+    @Query(nativeQuery = true, value = "select count(n.id) from notice n where n.course_id = ?1")
+    int getNoticeByCourseIdCount(int id);
 }

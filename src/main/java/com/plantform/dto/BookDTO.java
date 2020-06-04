@@ -4,14 +4,45 @@ public class BookDTO {
     String name;
     String publish;
     String type;
-    String addTime;
     String publishTime;
-//    String[] addTimeStartAndEnd;
-//    String[] publishTimeStartAndEnd;
-    String addTimeStart;
-    String addTimeEnd;
     String publishTimeStart;
     String publishTimeEnd;
+    String author;
+    String isbn;
+    String introduction;
+    String imageUrl;
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getIntroduction() {
+        return introduction;
+    }
+
+    public void setIntroduction(String introduction) {
+        this.introduction = introduction;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
 
     public String getName() {
         return name;
@@ -37,36 +68,12 @@ public class BookDTO {
         this.type = type;
     }
 
-    public String getAddTime() {
-        return addTime;
-    }
-
-    public void setAddTime(String addTime) {
-        this.addTime = addTime;
-    }
-
     public String getPublishTime() {
         return publishTime;
     }
 
     public void setPublishTime(String publishTime) {
         this.publishTime = publishTime;
-    }
-
-    public String getAddTimeStart() {
-        return addTimeStart;
-    }
-
-    public void setAddTimeStart(String addTimeStart) {
-        this.addTimeStart = addTimeStart;
-    }
-
-    public String getAddTimeEnd() {
-        return addTimeEnd;
-    }
-
-    public void setAddTimeEnd(String addTimeEnd) {
-        this.addTimeEnd = addTimeEnd;
     }
 
     public String getPublishTimeStart() {

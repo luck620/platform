@@ -199,6 +199,7 @@ public class StudentController {
         student1.setMail(student.getMail());
         student1.setPassword(student.getPassword());
         student1.setGrade(student.getGrade());
+        student1.setImageUrl("http://qaath1lbd.bkt.clouddn.com/"+student.getImageUrl());
         Student student2 = studentRepository.save(student1);
         if(student2 != null){
             myResult.setCode(200);
@@ -245,8 +246,8 @@ public class StudentController {
     @PostMapping("/editStudentById/{id}")
     public MyResult editStudentById(@PathVariable("id") int id,
                                     @RequestBody Student editForm){
-        System.out.println("id="+id+" name="+editForm.getName()+" phone="+editForm.getPhone()+" getSno="+editForm.getSno()+" getMail="+editForm.getMail()+" getPassword="+editForm.getPassword()+" Grade="+editForm.getGrade());
-        int result = studentRepository.update(editForm.getName(),editForm.getSno(),editForm.getPhone(),editForm.getMail(),editForm.getGrade(),editForm.getPassword(),id);
+        System.out.println("id="+id+" name="+editForm.getName()+" phone="+editForm.getPhone()+" getSno="+editForm.getSno()+" getMail="+editForm.getMail()+" getPassword="+editForm.getPassword()+" Grade="+editForm.getGrade()+" imageUrl="+editForm.getImageUrl());
+        int result = studentRepository.update(editForm.getName(),editForm.getSno(),editForm.getPhone(),editForm.getMail(),editForm.getGrade(),editForm.getPassword(),"http://qaath1lbd.bkt.clouddn.com/"+editForm.getImageUrl(),id);
         System.out.println("result= "+result);
         MyResult myResult = new MyResult();
         if(result == 1){

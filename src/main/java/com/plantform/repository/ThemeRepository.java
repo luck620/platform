@@ -17,4 +17,8 @@ public interface ThemeRepository extends JpaRepository<Theme,Integer> {
 
     @Query(nativeQuery = true,value = "select t.* from theme t where t.type='others'")
     List<Theme> findThemeByOthers();
+
+    @Query(nativeQuery = true,value = "select count(t.id) from theme t ")
+    int findThemeAllCount();
+
 }

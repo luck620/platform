@@ -4,8 +4,10 @@ import com.plantform.entity.News;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 public interface NewsRepository extends JpaRepository<News,Integer> {
@@ -65,4 +67,9 @@ public interface NewsRepository extends JpaRepository<News,Integer> {
     //查找高校专区
     @Query(nativeQuery = true, value = "select n.* from news n where n.type= ?1 and n.page_type='university'")
     List<News> findUniversityByType(String type);
+
+    @Query(nativeQuery = true, value = "update news n set n.author=?1,n.date=?2,n.image_url=?3,n.source=?4,n.title=?5,n.content=?6 where n.id=?7 ")
+    @Modifying
+    @Transactional
+    int update(String author, String date, String imageUrl, String source, String title, String content, int id);
 }

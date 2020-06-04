@@ -49,9 +49,9 @@ public class TeacherController {
         String tno = teacherDTO.getTno();
         String mail = teacherDTO.getMail();
         String courseName = teacherDTO.getCourseName();
-        System.out.println("name="+name+" phone="+phone+" tno="+tno+" mail="+mail+" courseName="+courseName);
-        List<Teacher> teacherList = teacherRepository.findAllByOthers(name,phone,tno,mail,courseName);
-        int totalElements = teacherRepository.findAllByOthersCount(name,phone,tno,mail,courseName);
+        System.out.println("name="+name+" phone="+phone+" tno="+tno+" mail="+mail);
+        List<Teacher> teacherList = teacherRepository.findAllByOthers(name,phone,tno,mail);
+        int totalElements = teacherRepository.findAllByOthersCount(name,phone,tno,mail);
         System.out.println("totalElements="+totalElements);
         List<TeacherDTO> teacherDTOList = new ArrayList<>();
         if(teacherList!=null && !teacherList.isEmpty()) {
@@ -63,6 +63,7 @@ public class TeacherController {
                 teacherDTO1.setTno(teacher.getTno());
                 teacherDTO1.setMail(teacher.getMail());
                 teacherDTO1.setPassword(teacher.getPassword());
+                teacherDTO1.setImageUrl(teacher.getImageUrl());
 //                if(teacher.getCourse() != null) {
 //                    teacherDTO1.setCourseId(teacher.getCourse().getId());
 //                    teacherDTO1.setCourseName(teacher.getCourse().getName());
@@ -86,8 +87,7 @@ public class TeacherController {
         teacher.setTno(teacherDTO.getTno());
         teacher.setMail(teacherDTO.getMail());
         teacher.setPassword(teacherDTO.getPassword());
-        String courseName = teacherDTO.getCourseName();
-        Course course = courseRepository.findCourseByName(courseName);
+        teacher.setImageUrl("http://qaath1lbd.bkt.clouddn.com/" + teacherDTO.getImageUrl());
 //        teacher.setCourse(course);
         Teacher teacher1 = teacherRepository.save(teacher);
         if(teacher1 != null){
@@ -159,8 +159,9 @@ public class TeacherController {
                                     @RequestBody TeacherDTO editForm){
         String courseName = editForm.getCourseName();
         Course course = courseRepository.findCourseByName(courseName);
-        System.out.println("id="+id+" name="+editForm.getName()+" phone="+editForm.getPhone()+" getTno="+editForm.getTno()+" getMail="+editForm.getMail()+" getPassword="+editForm.getPassword()+" course="+course.toString());
-        int result = teacherRepository.update(editForm.getName(),editForm.getPhone(),editForm.getTno(),editForm.getMail(),editForm.getPassword(),course,id);
+        System.out.println("id="+id+" name="+editForm.getName()+" phone="+editForm.getPhone()+" getTno="+editForm.getTno()+" getMail="+editForm.getMail()+" getPassword="+editForm.getPassword()+" imageUrl="+ editForm.getImageUrl());
+        System.out.println("id="+id+" name="+editForm.getName()+" phone="+editForm.getPhone()+" getTno="+editForm.getTno()+" getMail="+editForm.getMail()+" getPassword="+editForm.getPassword()+" imageUrl="+ editForm.getImageUrl());
+        int result = teacherRepository.update(editForm.getName(),editForm.getPhone(),editForm.getTno(),editForm.getMail(),editForm.getPassword(),"http://qaath1lbd.bkt.clouddn.com/" + editForm.getImageUrl(),id);
         System.out.println("result= "+result);
         MyResult myResult = new MyResult();
         if(result == 1){

@@ -20,14 +20,14 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
     @Query(nativeQuery = true, value = "select s.* from student s where s.id=?1")
     Student checkInfo(int id);
 
-    @Query(nativeQuery = true,value = "select s.* from student s inner join sc c on c.sid = s.id where c.cid = ?1 " +
+    @Query(nativeQuery = true,value = "select s.* from student s inner join sc c on c.student_id = s.id where c.course_id = ?1 " +
             "and case when ?2='' then 1=1 else s.name like %?2% end " +
             "and case when ?3='' then 1=1 else s.sno like %?3% end " +
             "and case when ?4='' then 1=1 else s.phone like %?4% end " +
             "and case when ?5='' then 1=1 else s.grade like %?5% end ")
     List<Student> findStudentByCourseId(int id, String name, String sno, String phone, String grade);
 
-    @Query(nativeQuery = true,value = "select count(s.id) from student s inner join sc c on c.sid = s.id where c.cid = ?1 " +
+    @Query(nativeQuery = true,value = "select count(s.id) from student s inner join sc c on c.student_id = s.id where c.course_id = ?1 " +
             "and case when ?2='' then 1=1 else s.name like %?2% end " +
             "and case when ?3='' then 1=1 else s.sno like %?3% end " +
             "and case when ?4='' then 1=1 else s.phone like %?4% end " +
@@ -61,10 +61,10 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
     @Query(nativeQuery = true, value = "select s.* from student s where s.id = ?1")
     Student findStudentById(int id);
 
-    @Query(nativeQuery = true, value = "update student s set s.name=?1,s.sno=?2,s.phone=?3,s.mail=?4,s.grade=?5,s.password=?6 where s.id=?7 ")
+    @Query(nativeQuery = true, value = "update student s set s.name=?1,s.sno=?2,s.phone=?3,s.mail=?4,s.grade=?5,s.password=?6,s.image_url=?7 where s.id=?8 ")
     @Modifying
     @Transactional
-    int update(String name, String sno, String phone, String mail, String grade, String password, int id);
+    int update(String name, String sno, String phone, String mail, String grade, String password,String imageUrl, int id);
 
     @Query(nativeQuery = true, value = "update student s set s.name=?1,s.sno=?2,s.mail=?3 where s.id=?4 ")
     @Modifying

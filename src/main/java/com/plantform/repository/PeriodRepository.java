@@ -20,6 +20,12 @@ public interface PeriodRepository extends JpaRepository<Period, Integer> {
     @Query(nativeQuery = true, value = "select distinct(p.weekst) from period p inner join course c on p.course_id=c.id where c.courseno=?1")
     List<String> getWeekST(String courseNO);
 
+    @Query(nativeQuery = true, value = "select p.* from period p where p.course_id = ?1")
+    List<Period> getPeriodList(int id);
+
+    @Query(nativeQuery = true, value = "select count(p.id) from period p where p.course_id = ?1")
+    int getPeriodListCount(int id);
+
     @Modifying
     @Transactional
     @Query(nativeQuery = true, value = "update period p set p.video_url=?1 where p.id=?2")

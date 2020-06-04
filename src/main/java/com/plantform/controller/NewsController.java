@@ -1,7 +1,9 @@
 package com.plantform.controller;
 
 import com.plantform.dto.Image;
+import com.plantform.entity.Book;
 import com.plantform.entity.Course;
+import com.plantform.entity.MyResult;
 import com.plantform.entity.News;
 import com.plantform.repository.NewsRepository;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,10 +23,21 @@ public class NewsController {
     @Resource
     NewsRepository newsRepository;
 
+    DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
     public static <T> Page<T> listConvertToPage1(List<T> list, int totalElements, Pageable pageable) {
         int start = (int)pageable.getOffset();
         int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
         return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
+    }
+
+    //获取所有新闻数据
+    @ResponseBody
+    @GetMapping("/findAllNews/{pageNum}/{pageSize}")
+    public Page<News> findAllNews(@PathVariable("pageNum") Integer pageNum,
+                                       @PathVariable("pageSize") Integer pageSize){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        return newsRepository.findAll(pageable);
     }
 
     //获取新闻数据
@@ -117,6 +131,24 @@ public class NewsController {
     @GetMapping("/findNewsById/{id}")
     public News findNewsById(@PathVariable("id") int id){
         return newsRepository.findNewsById(id);
+    }
+
+    //后台修改新闻
+    @ResponseBody
+    @PostMapping("/editNewsById/{id}")
+    public MyResult editNewsById(@PathVariable("id") int id,
+                                 @RequestBody News news){
+        String imageUrl = "http://qaath1lbd.bkt.clouddn.com/"+news.getImageUrl();
+        System.out.println(news.getAuthor()+news.getDate().toString()+news.getImageUrl()+news.getSource()+news.getTitle()+id);
+        int result = newsRepository.update(news.getAuthor(),news.getDate().toString(),news.getImageUrl(),news.getSource(),news.getTitle(),news.getContent(),id);
+        System.out.println("result= "+result);
+        MyResult myResult = new MyResult();
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("修改成功");
+            return myResult;
+        }
+        return myResult;
     }
 
     //教学研究

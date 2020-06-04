@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableArgumentResolver;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -24,6 +25,12 @@ public class ThemeController {
 
     @Resource
     ThemeDetailRepository themeDetailRepository;
+
+    public static <T> Page<T> listConvertToPage1(List<T> list, int totalElements, Pageable pageable) {
+        int start = (int)pageable.getOffset();
+        int end = (start + pageable.getPageSize()) > list.size() ? list.size() : (start + pageable.getPageSize());
+        return new PageImpl<T>(list.subList(start, end), pageable, totalElements);
+    }
 
     //查找类型为important的专题
     @ResponseBody
@@ -43,6 +50,29 @@ public class ThemeController {
             }
         }
         return themeDTOList;
+    }
+
+    //查找所有
+    @ResponseBody
+    @GetMapping("/getThemeAll/{pageNum}/{pageSize}")
+    public Page<ThemeDTO> getThemeAll(@PathVariable("pageNum") Integer pageNum,
+                                   @PathVariable("pageSize") Integer pageSize){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        int totalElements = themeRepository.findThemeAllCount();
+        List<Theme> themeList =  themeRepository.findAll();
+        List<ThemeDTO> themeDTOList = new ArrayList<>();
+        if(themeList != null && !themeList.isEmpty()){
+            for(Theme theme : themeList){
+                ThemeDTO themeDTO = new ThemeDTO();
+                themeDTO.setId(theme.getId());
+                themeDTO.setImageUrl(theme.getImageUrl());
+                themeDTO.setTitle(theme.getTitle());
+                themeDTO.setType(theme.getType());
+                themeDTOList.add(themeDTO);
+            }
+        }
+        Page<ThemeDTO> themePage = listConvertToPage1(themeDTOList,totalElements,pageable);
+        return themePage;
     }
 
     //查找类型为others的专题
@@ -97,5 +127,31 @@ public class ThemeController {
         themeDetailDTO.setTitle(themeDetail.getTitle());
         themeDetailDTO.setVideoUrl(themeDetail.getVideoUrl());
         return themeDetailDTO;
+    }
+
+    //根据themeid查找themeDetail
+    @ResponseBody
+    @GetMapping("/getThemeDetailById/{id}/{pageNum}/{pageSize}")
+    public Page<ThemeDetailDTO> getThemeDetailById(@PathVariable("id") int id,
+                                                   @PathVariable("pageNum") Integer pageNum,
+                                                   @PathVariable("pageSize") Integer pageSize){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<ThemeDetail> themeDetailList = themeDetailRepository.findThemeDetailById(id);
+        List<ThemeDetailDTO> themeDetailDTOList = new ArrayList<>();
+        int totalElements = themeDetailRepository.findThemeDetailByIdCount(id);
+        if(themeDetailList.size()>0){
+            for(ThemeDetail themeDetail : themeDetailList){
+                ThemeDetailDTO themeDetailDTO = new ThemeDetailDTO();
+                themeDetailDTO.setId(themeDetail.getId());
+                themeDetailDTO.setAuthor(themeDetail.getAuthor());
+                themeDetailDTO.setContent(themeDetail.getContent());
+                themeDetailDTO.setImageUrl(themeDetail.getImageUrl());
+                themeDetailDTO.setTitle(themeDetail.getTitle());
+                themeDetailDTO.setVideoUrl(themeDetail.getVideoUrl());
+                themeDetailDTOList.add(themeDetailDTO);
+            }
+        }
+        Page<ThemeDetailDTO> themeDetailDTOPage = listConvertToPage1(themeDetailDTOList,totalElements,pageable);
+        return themeDetailDTOPage;
     }
 }

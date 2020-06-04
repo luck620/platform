@@ -58,6 +58,33 @@ public class NoticeController {
         return noticeDTOPage;
     }
 
+    //后台管理根据课程id获取公告资源
+    @ResponseBody
+    @GetMapping("/getNoticeByCourseId/{pageNum}/{pageSize}/{id}")
+    public Page<NoticeDTO> getNoticeByCourseId(@PathVariable("pageNum") Integer pageNum,
+                                              @PathVariable("pageSize") Integer pageSize,
+                                              @PathVariable("id")int id){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Notice> noticeList =  noticeRepository.getNoticeByCourseId(id);
+        int totalElements = noticeRepository.getNoticeByCourseIdCount(id);
+        List<NoticeDTO> noticeList1 = new ArrayList<>();
+        if(noticeList!=null &&!noticeList.isEmpty()){
+            for(Notice notice: noticeList){
+                NoticeDTO noticeDTO = new NoticeDTO();
+                noticeDTO.setId(notice.getId());
+                noticeDTO.setContent(notice.getContent());
+                noticeDTO.setTitle(notice.getTitle());
+                noticeDTO.setDate(notice.getDate().toString().replace('T',' '));
+                noticeDTO.setWordUrl(notice.getWordUrl());
+                noticeDTO.setCourseId(notice.getCourse().getId());
+                noticeDTO.setCourseName(notice.getCourse().getName());
+                noticeList1.add(noticeDTO);
+            }
+        }
+        Page<NoticeDTO> noticeDTOPage = listConvertToPage1(noticeList1, totalElements, pageable);
+        return noticeDTOPage;
+    }
+
     //学生获取公告
     @ResponseBody
     @GetMapping("/getCourseStuNotice/{pageNum}/{pageSize}/{id}")

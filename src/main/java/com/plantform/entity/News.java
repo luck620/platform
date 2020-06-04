@@ -3,6 +3,7 @@ package com.plantform.entity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,8 +16,8 @@ public class News {
     private String title;
 
     @Column
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime date;
+    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "yyyy-MM-dd")
+    private LocalDate date;
 
     @Column
     private String imageUrl;
@@ -68,11 +69,11 @@ public class News {
         this.title = title;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

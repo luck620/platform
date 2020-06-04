@@ -125,6 +125,28 @@ public class CourseController {
         return  courseDetail;
     }
 
+    //课程课时详情
+    @ResponseBody
+    @PostMapping("/findCourseDetailPeriod/{id}/{pageNum}/{pageSize}")
+    public Page<Period> findCourseDetailPeriod(@PathVariable("id") int id,
+                                             @PathVariable("pageNum") Integer pageNum,
+                                             @PathVariable("pageSize") Integer pageSize){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Period> periodList = periodRepository.getPeriodList(id);//查询该课程的教师
+        int totalElements = periodRepository.getPeriodListCount(id);
+        List<Period> periodList1 = new ArrayList<>();//存放teacher的几个相关信息
+        for(Period period : periodList){
+            Period period1 = new Period();
+            period1.setId(period.getId());
+            period1.setWeekST(period.getWeekST());
+            period1.setPeriodST(period.getPeriodST());
+            period1.setVideoUrl(period.getVideoUrl());
+            periodList1.add(period1);
+        }
+        Page<Period> periodPage = listConvertToPage1(periodList1,totalElements,pageable);
+        return periodPage;
+    }
+
     //课程详情---教师
     @ResponseBody
     @PostMapping("/findCourseDetailTea/{id}/{pageNum}/{pageSize}")
@@ -258,6 +280,64 @@ public class CourseController {
             }
         }
         Page<Course> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+        return coursePage;
+    }
+
+    //后端模糊查询
+    @ResponseBody
+    @PostMapping("/getCourseListByOthers/{pageNum}/{pageSize}")
+    public Page<CourseDTO> getCourseListByOthers(@PathVariable("pageNum") Integer pageNum,
+                                      @PathVariable("pageSize") Integer pageSize,
+                                      @RequestBody CourseDTO courseDTO){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Course> courseList =  courseRepository.findAllByOthers(courseDTO.getName(),courseDTO.getTeacherName(),courseDTO.getNumberStart(),courseDTO.getNumberEnd());
+        int totalElements = courseRepository.findAllByOthersCount(courseDTO.getName(),courseDTO.getTeacherName(),courseDTO.getNumberStart(),courseDTO.getNumberEnd());
+        List<CourseDTO> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                CourseDTO courseDTO1 = new CourseDTO();
+                courseDTO1.setId(course.getId());
+                courseDTO1.setName(course.getName());
+                courseDTO1.setImageUrl(course.getImageUrl());
+                courseDTO1.setCourseNO(course.getCourseNO());
+                courseDTO1.setDescription(course.getDescription());
+                courseDTO1.setPeriodNum(course.getPeriodNum());
+                courseDTO1.setWeekNum(course.getWeekNum());
+                courseDTO1.setTestUrl(course.getTestUrl());
+                courseDTO1.setStuNum(course.getStuNum());
+                courseDTO1.setTeacherName(course.getTeacher().getName());
+                courseList1.add(courseDTO1);
+            }
+        }
+        Page<CourseDTO> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
+        return coursePage;
+    }
+
+    @ResponseBody
+    @GetMapping("/getCourseListHou/{pageNum}/{pageSize}")
+    public Page<CourseDTO> getCourseListHou(@PathVariable("pageNum") Integer pageNum,
+                                         @PathVariable("pageSize") Integer pageSize){
+        Pageable pageable = PageRequest.of(pageNum,pageSize);
+        List<Course> courseList =  courseRepository.findCourseAll();
+        int totalElements = courseRepository.findCourseAllCount();
+        List<CourseDTO> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                CourseDTO courseDTO = new CourseDTO();
+                courseDTO.setId(course.getId());
+                courseDTO.setName(course.getName());
+                courseDTO.setImageUrl(course.getImageUrl());
+                courseDTO.setCourseNO(course.getCourseNO());
+                courseDTO.setDescription(course.getDescription());
+                courseDTO.setPeriodNum(course.getPeriodNum());
+                courseDTO.setWeekNum(course.getWeekNum());
+                courseDTO.setTestUrl(course.getTestUrl());
+                courseDTO.setStuNum(course.getStuNum());
+                courseDTO.setTeacherName(course.getTeacher().getName());
+                courseList1.add(courseDTO);
+            }
+        }
+        Page<CourseDTO> coursePage = listConvertToPage1(courseList1, totalElements, pageable);
         return coursePage;
     }
 
@@ -475,24 +555,27 @@ public class CourseController {
         Course course1 = new Course();
         course1.setId(course.getId());
         course1.setName(course.getName());
+        course1.setCourseNO(course.getCourseNO());
+        course1.setDescription(course.getDescription());
         return course1;
     }
 
-//    @ResponseBody
-//    @PostMapping("/editCourseById/{id}")
-//    public MyResult editCourseById(@PathVariable("id") int id,
-//                                 @RequestBody CourseDTO editForm){
-//        System.out.println("id="+id+" name="+editForm.getName()+" useBook="+editForm.getUseBook());
-//        int result = courseRepository.update(editForm.getName(),editForm.getUseBook(),id);
-//        System.out.println("result= "+result);
-//        MyResult myResult = new MyResult();
-//        if(result == 1){
-//            myResult.setCode(200);
-//            myResult.setMsg("修改成功");
-//            return myResult;
-//        }
-//        return null;
-//    }
+    @ResponseBody
+    @PostMapping("/editCourseById/{id}")
+    public MyResult editCourseById(@PathVariable("id") int id,
+                                 @RequestBody CourseDTO editForm){
+        System.out.println("id="+id+" name="+editForm.getName()+" courseNO="+editForm.getCourseNO() +" imageUrl ="+editForm.getImageUrl()+" description="+editForm.getDescription());
+        String imageUrl = "http://qaath1lbd.bkt.clouddn.com/"+editForm.getImageUrl();
+        int result = courseRepository.update(editForm.getName(),imageUrl, editForm.getCourseNO(),editForm.getDescription(),id);
+        System.out.println("result= "+result);
+        MyResult myResult = new MyResult();
+        if(result == 1){
+            myResult.setCode(200);
+            myResult.setMsg("修改成功");
+            return myResult;
+        }
+        return null;
+    }
 
     @ResponseBody
     @GetMapping("/deleteCourseById/{id}")
