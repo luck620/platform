@@ -343,8 +343,32 @@ public class CourseController {
 
     @ResponseBody
     @GetMapping("/getCourseListWithoutPage")
-    public List<Course> getCourseList(){
+    public List<CourseDTO> getCourseList(){
         List<Course> courseList =  courseRepository.findAll();
+        List<CourseDTO> courseList1 = new ArrayList<>();
+        if(courseList!=null &&!courseList.isEmpty()){
+            for(Course course: courseList){
+                CourseDTO courseDTO = new CourseDTO();
+                courseDTO.setId(course.getId());
+                courseDTO.setName(course.getName());
+                courseDTO.setImageUrl(course.getImageUrl());
+                courseDTO.setCourseNO(course.getCourseNO());
+                courseDTO.setDescription(course.getDescription());
+                courseDTO.setPeriodNum(course.getPeriodNum());
+                courseDTO.setWeekNum(course.getWeekNum());
+                courseDTO.setTestUrl(course.getTestUrl());
+                courseDTO.setTeacherName(course.getTeacher().getName());
+                courseList1.add(courseDTO);
+            }
+        }
+        return courseList1;
+    }
+
+    //选择课程上传测验或公告
+    @ResponseBody
+    @GetMapping("/getCourseListByTeacher/{id}")
+    public List<Course> getCourseListByTeacher(@PathVariable("id") int id){
+        List<Course> courseList =  courseRepository.findCourseByTeacher(id);
         List<Course> courseList1 = new ArrayList<>();
         if(courseList!=null &&!courseList.isEmpty()){
             for(Course course: courseList){

@@ -76,4 +76,10 @@ public interface StudentRepository extends JpaRepository<Student,Integer> {
     @Transactional
     int changeHead(String imageUrl , int id);
 
+    @Query(nativeQuery = true, value = "select s.phone from student s ")
+    List<String> getStuPhone();
+
+    @Query(nativeQuery = true, value = "select t.phone from teacher t ")
+    List<String> getTeaPhone();
+
 }

@@ -30,6 +30,26 @@ public class StudentController {
     @Resource
     TeacherRepository teacherRepository;
 
+    //查询所有教师、学生手机号
+    @ResponseBody
+    @GetMapping("/getPhoneList")
+    public List<String> getPhoneList(){
+        List<String> stuPhoneList = studentRepository.getStuPhone();
+        List<String> teaPhoneList = studentRepository.getTeaPhone();
+        List<String> phoneList = new ArrayList<>();
+        if(stuPhoneList.size()>0){
+            for(String stuPhone : stuPhoneList){
+                phoneList.add(stuPhone);
+            }
+        }
+        if(stuPhoneList.size()>0){
+            for(String teaPhone : teaPhoneList){
+                phoneList.add(teaPhone);
+            }
+        }
+        return phoneList;
+    }
+
     //登陆
     @ResponseBody
     @PostMapping("/login")
@@ -115,7 +135,7 @@ public class StudentController {
         Boolean b = true;
         if(type.equals("student")){
             Student student = studentRepository.checkInfo(id);
-            if(student.getGrade() == null || student.getMail() == null || student.getSno() == null || student.getName() == null){
+            if(student.getMail() == null || student.getSno() == null || student.getName() == null){
                 b = false;
             }
         }

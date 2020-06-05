@@ -20,6 +20,12 @@ public interface PeriodRepository extends JpaRepository<Period, Integer> {
     @Query(nativeQuery = true, value = "select distinct(p.weekst) from period p inner join course c on p.course_id=c.id where c.courseno=?1")
     List<String> getWeekST(String courseNO);
 
+    @Query(nativeQuery = true, value = "select p.* from period p inner join course c on p.course_id=c.id where p.weekst=?1 and c.id=?2")
+    List<Period> getPeriodSTById(String weekST, int id);
+
+    @Query(nativeQuery = true, value = "select distinct(p.weekst) from period p inner join course c on p.course_id=c.id where c.id=?1")
+    List<String> getWeekSTById(int id);
+
     @Query(nativeQuery = true, value = "select p.* from period p where p.course_id = ?1")
     List<Period> getPeriodList(int id);
 
@@ -30,5 +36,8 @@ public interface PeriodRepository extends JpaRepository<Period, Integer> {
     @Transactional
     @Query(nativeQuery = true, value = "update period p set p.video_url=?1 where p.id=?2")
     int updatePeriod(String videoUrl, int id);
+
+    @Query(nativeQuery = true, value = "select p.* from period p where p.id = ?1")
+    Period getPeriodById(int id);
 
 }

@@ -94,6 +94,9 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
     @Query(nativeQuery = true, value = "select c.* from course c where c.name = ?1")
     Course findCourseByName(String courseName);
 
+    @Query(nativeQuery = true, value = "select c.* from course c where c.teacher_id = ?1")
+    List<Course> findCourseByTeacher(int id);
+
     @Query(nativeQuery = true, value = "update course c set c.name=?1,c.image_url=?2,c.courseno=?3,c.description=?4 where c.id=?5 ")
     @Modifying
     @Transactional
